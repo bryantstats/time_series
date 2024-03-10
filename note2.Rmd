@@ -1,0 +1,730 @@
+
+---
+title: "Smoothing Techniques"
+author: <font size="5"> Son Nguyen </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{css, echo=FALSE}
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+```{r setup, include = FALSE}
+
+# R markdown options
+knitr::opts_chunk$set(echo = FALSE, 
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE,
+                      warning = FALSE)
+
+# Load packages
+library(tidyverse)
+library(forecast)
+```
+
+
+# Smoothing
+
+-   Smoothing is usually done to reveal the series patterns and trends.
+
+---
+# Simple Moving Average Smoothing
+
+-   Moving Average (MA) creates a new series by averaging the most recent observations from the original series.
+
+-   MA(k) creates $s_t$ as follows.
+
+$$s_{t} = \frac{y_t + y_{t-1} +...+ y_{t-k+1}}{k}$$
+
+-   Larger $k$ will smooth the series more strongly
+
+---
+# Example
+
+```{r}
+library(ggfortify)
+library(tidyverse)
+library(xts)
+library(fpp2)
+library(TTR)
+
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 8
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Medical Component of the CPI"))
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 4
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 8
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 16
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 32
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+t1 = read_csv("data/beer.csv")
+t1 = ts(t1, start = c(1956, 1), freq = 4)
+k = 1
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Original Series"))
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+t1 = read_csv("data/beer.csv")
+t1 = ts(t1, start = c(1956, 1), freq = 4)
+k = 2
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+k = 5
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+k = 12
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Forecasting
+
+-   We can use MA smoothing for forecasting
+
+-   We have 
+
+\begin{align*}
+    \hat{s}_t &= \frac{y_t + y_{t-1} +...+ y_{t-k+1}}{k}\\
+    &=\frac{y_t + y_{t-1} +...+ y_{t-k+1}+y_{t-k}-y_{t-k}}{k}\\
+    &=\frac{y_t + \bigg(y_{t-1} +...+ y_{t-k+1}+y_{t-k}\bigg)-y_{t-k}}{k}\\
+    &= \frac{y_t + k\hat{s}_{t-1}-y_{t-k}}{k}\\
+    &= \hat{s}_{t-1} + \frac{y_t-y_{t-k}}{k}
+\end{align*}
+
+---
+# Forecasting
+
+-   If there is no trend in $y_t$ the second term $(y_t-y_{t-k})/k$ can be ignored
+-   Forecasting $l$ lead time into future by
+
+$$
+\hat{y}_{T+l} = \hat{s}_T
+$$
+
+-   If there is a linear trend in a series, we can use the double moving average to estimate the trend (slope)
+
+---
+class: inverse, center, middle
+
+# Double MA
+
+---
+# Double MA
+
+-   Linear trend time series: $$
+    y_t = \beta_0 + \beta_1t +\epsilon_t
+    $$
+
+-   Step 1: MA Smooth the series 
+$$\hat{s}^{(1)}_{t} = \frac{y_t + y_{t-1} +...+ y_{t-k+1}}{k}$$
+
+-   Step 2: MA Smooth the smoothed series 
+
+$$\hat{s}^{(2)}_{t} = \frac{\hat{s}^{(1)}_t + \hat{s}^{(1)}_{t-1} +...+ \hat{s}^{(1)}_{t-k+1}}{k}$$
+
+-   Step 3: Calculate the linear trend/slope $$
+    b_1 = \hat{\beta_1} =  \frac{2}{k-1}\bigg(\hat{s}_T^{(1)}-\hat{s}_T^{(2)}\bigg)
+    $$
+
+---
+# Forecasting
+
+-   Forecasting $l$ lead time into future by $$
+    \hat{y}_{T+l} = \hat{s}^{(1)}_T + b_1 \cdot l
+    $$
+
+---
+# Example
+
+You are given the following time series
+
+| $t$   | 1   | 2   | 3   | 4   | 5   |
+|:------|:----|:----|:----|:----|:----|
+| $y_t$ | 1   | 3   | 5   | 8   | 13  |
+
+-   Forecasting $y_{6}$ using simple moving average with $k = 2$
+
+-   Forecasting $y_{6}$ using double moving average with $k = 2$
+
+
+---
+# Example
+
+-   We simulate 100 data points ($T=100$) of $$
+    y_t = 1 +3t + \epsilon, 
+    $$ where, $\epsilon \sim N(0, 5^2)$.
+
+---
+# Example
+
+```{r}
+set.seed(2022)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 1
+b1 = 3
+
+e = rnorm(n, sd = 5)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*t+e[t]
+}
+
+k = 12 
+s1 = SMA(y, n = k)
+s2 = SMA(s1, n = k)
+
+
+b1_hat = 2*(s1[n]-s2[n])/(k-1)
+
+autoplot(ts(y)) + ggtitle("Original Series")
+```
+
+---
+# Example
+
+```{r}
+autoplot(ts(s1)) + ggtitle(paste0("MA Series with k = ",k))
+```
+
+---
+# Example
+
+```{r}
+autoplot(ts(s2)) + ggtitle(paste0("Double MA Series with k = ",k))
+```
+
+---
+# Example
+
+-   Using the above steps, the estimated trend is $b_1 = 2.92$
+
+-   The forecast for the next points from $y_{100}$ is
+
+$$\hat{y}_{100+l} = \hat{s}_{100}+ b_1\cdot l = \hat{s}_{100}+ 2.92\cdot l$$
+---
+class: inverse, center, middle
+
+# Exponential Smoothing
+
+
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 2
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 4
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 6
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 10
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 15
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .1
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .3
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .5
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .7
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .9
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .99
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+---
+# Exponential Smoothing
+
+-   MA distributes the weight equally to the recent observations
+
+-   Exponential Smoothing controls the weights of the recent observations by $w$
+
+$$\hat{s}_{t} = \frac{y_t + wy_{t-1} + w^2y_{t-2} + ... + w^ty_0}{1/(1-w)}$$
+
+-   Smaller $w$ smooths the series more lightly.
+
+-   Greater $w$ smooths the series more strongly.
+
+---
+# Exponential Smoothing
+
+-   We have 
+
+\begin{align*}
+    \hat{s}_{t} & = \hat{s}_{t-1} + (1-w)(y_t-\hat{s}_{t-1})\\
+                & = (1-w)y_t + w\hat{s}_{t-1}
+\end{align*}
+
+-   When $w \to 0$, $\hat{s}_{t} \to y_t$, or little smoothing has taken
+
+---
+# Example
+
+```{r}
+library(ggfortify)
+library(tidyverse)
+library(xts)
+library(fpp2)
+library(TTR)
+## Data 1
+t1 = read_csv("data/beer.csv")
+t1 = ts(t1, start = c(1956, 1), freq = 4)
+```
+
+```{r}
+## Data 1
+# In exponential smoothing, a higher ratio will weight more on the recent observation, 
+# ratio close to 1 will have a 100% weight on the most recent observation
+alpha = .9
+t1_ema = EMA(t1, ratio = alpha)
+plot(t1,  main = paste0("Exponential Smoothing with w = ", 1- alpha))
+lines(t1_ema, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+# In exponential smoothing, a higher ratio will weight more on the recent observation, 
+# ratio close to 1 will have a 100% weight on the most recent observation
+alpha = .5
+t1_ema = EMA(t1, ratio = alpha)
+plot(t1,  main = paste0("Exponential Smoothing with w = ", 1- alpha))
+lines(t1_ema, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+# In exponential smoothing, a higher ratio will weight more on the recent observation, 
+# ratio close to 1 will have a 100% weight on the most recent observation
+alpha = .1
+t1_ema = EMA(t1, ratio = alpha)
+plot(t1,  main = paste0("Exponential Smoothing with w = ", 1- alpha))
+lines(t1_ema, col = "red")
+```
+
+---
+# Double Exponential Smoothing
+
+We can use double smoothing to identify the trend and forecast linear trend time series as follows.
+
+-   Step 1: Create a smoothed series: $\hat{s}^{(1)}_{t} = (1-w)y_t + w\hat{s}^{(1)}_{t-1}$
+
+-   Step 2: Create a double smoothed series: $\hat{s}^{(2)}_{t} = (1-w)\hat{s}^{(1)}_{t} + w\hat{s}^{(2)}_{t-1}$
+
+-   Step 3: Estimate the trend: 
+$$b_1 = \frac{1-w}{w}(\hat{s}^{(1)}_{T}-\hat{s}^{(2)}_{T})$$
+
+-   Step 4: Forecast
+
+$$\hat{y}_{T+l} = \hat{s}^{(1)}_{T} + b_1\cdot l$$
+
+---
+# Example
+
+You are given the following time series
+
+| $t$   | 1   | 2   | 3   | 4   | 5   |
+|:------|:----|:----|:----|:----|:----|
+| $y_t$ | 1   | 3   | 5   | 8   | 13  |
+
+-   Assume that this is a linear trend time series. Using double exponential smoothing with $w = .8$ to estimate the trend (slope) and forecast $y_{6}$.
+
+---
+class: middle, inverse, center
+
+# Time Series Decomposition
+
+
+---
+# Two decompositions
+
+
+-   Additive Decomposition
+
+$$
+y_t = S_t + T_t + R_t
+$$
+
+-   Multiplicative decomposition
+
+$$
+y_t = S_t\times T_t \times R_t
+$$
+
+- We can use smoothing to decompose a time series
+
+---
+# Relationship
+
+-   The log transformation will turn a multiplicative model to additive model.
+
+---
+# Central MA vs. MA
+
+[Link](https://tjeld.uia.no/shiny/valeriz/centered-vs-right/#:~:text=The%20turning%20point%20in%20a,the%20greater%20the%20lag%20time).
+
+# Classical Decomposition
+
+-   Trend Estimate: Smooth the data using centred moving average (CMA) of the order equal to the periodicity of the data
+
+-   Detrend the data: calculate the detrended series by subtracting/dividing the trend estimate
+
+-   Seasonal Estimate: Average value for each period is calculated based on the de-trended series.
+
+-   Random/Remainder: subtract from the series the trend and seasonal component estimations
+
+---
+# Example
+
+```{r}
+data("AirPassengers")
+plot(AirPassengers)
+```
+
+---
+# Example
+
+```{r}
+ourDecomposition <- decompose(AirPassengers, type="additive")
+plot(ourDecomposition)
+```
+
+---
+# Example
+
+```{r}
+ourDecomposition <- decompose(AirPassengers, type="multiplicative")
+plot(ourDecomposition)
+```
+
+---
+# Example
+
+```{r, echo=TRUE}
+y <- ts(c(1:100) + 
+          50*cos(seq(0,16*pi,length.out=100)) + 
+          rnorm(100,0,10),frequency=12)
+```
+
+---
+# Example
+
+```{r}
+y <- ts(c(1:100) + 50*cos(seq(0,16*pi,length.out=100)) + rnorm(100,0,10),frequency=12)
+ourDecomposition <- decompose(y, type="additive")
+plot(ourDecomposition)
+```
+
+---
+# STL Decomposition
+
+-   Classical Decomposition uses Central Moving Average to estimate the trend
+
+-   STL uses LOESS (locally estimated scatterplot smoothing) to estimate the trend
+
+-   [Link](https://www.wessa.net/download/stl.pdf)
+
+-   The seasonal component is estimated using moving averages of the de-trend series
+
+---
+# STL Decomposition
+
+-   STL is a versatile and robust method for decomposing time series
+
+-   STL can be implemented using `stl` function
+
+---
+# STL Decomposition
+
+```{r, eval=FALSE, echo=TRUE}
+data("AirPassengers")
+stl_Decomposition <- stl(AirPassengers, 
+                        s.window = "periodic")
+plot(stl_Decomposition)
+```
+
+---
+# STL Decomposition
+
+```{r, echo=FALSE}
+data("AirPassengers")
+ourDecomposition <- stl(AirPassengers, s.window = "periodic")
+plot(ourDecomposition)
+```
+
+---
+# Other Decomposition Methods
+
+-   X-11 decomposition: originated in the US Census Bureau and Statistics Canada
+
+-   SEATS decomposition: developed at the Bank of Spain, and is now widely used by government agencies around the world

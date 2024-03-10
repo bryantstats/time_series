@@ -1,0 +1,64 @@
+---
+output: 
+  html_document:
+    theme: cerulean
+---
+
+### Example html multiple choice question using Rmarkdown
+
+<!-- Render this Rmarkdown doc to html to make an interactive html / js multiple choice question -->
+
+Choose your favourite from the options below. Does it match mine?
+
+<!-- Answer options go here -->
+<div class="radio">
+  <label>
+    <input type="radio" name="question01" id="opt1" value="Cassowary" onchange="check_answer()">
+    Cassowary 
+  </label>
+</div>
+<div class="radio">
+  <label>
+    <input type="radio" name="question01" id="opt2" value="Bilby" onclick="check_answer()">
+    Bilby
+  </label>
+</div>
+<div class="radio">
+  <label>
+    <input type="radio" name="question01" id="opt3" value="Quokka" onclick="check_answer()">
+    Quokka 
+  </label>
+</div>
+
+<!-- Check answer button -->
+<div>
+<button class="btn btn-primary" type="button" onclick="check_answer()" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Show / Hide result</button>
+</div>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body" id="answerFeedback">
+    The answer selected was ...
+  </div>
+</div>
+
+<!-- Code to update answer feedback -->
+<script type="text/javascript">
+function check_answer()
+{
+    var radioButtons = document.getElementsByName("question01");
+    document.getElementById("answerFeedback").innerHTML = "Try selecting an answer!!";
+    for(var i = 0; i < radioButtons.length; i++)
+    {
+        if(radioButtons[i].checked == true)
+        {
+            var selectedAnswer = "Your selected answer was " + radioButtons[i].value;
+            <!-- feedback for correct / incorrect response -->
+            var feedback = "Not quite my favourite! Have another go." 
+            if(radioButtons[i].value == "Quokka") {
+              feedback = "They're my favourite too!"
+            }
+            document.getElementById("answerFeedback").innerHTML = selectedAnswer + "<br>" + feedback;
+            return true;
+        }
+    }
+}
+</script>
