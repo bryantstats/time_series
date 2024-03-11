@@ -112,338 +112,60 @@ library(tidyverse)
 library(forecast)
 ```
 
-
-# Cross Sectional vs. Time Series Data
-
--   Cross Sectional Data: Multiple objects observed at a particular point of time
-
 ---
-# Cross Sectional vs. Time Series Data
+class: inverse, middle, center
 
--   Cross Sectional Data: Multiple objects observed at a particular point of time
-
--   Examples: customers' behavioral data at today's update,companies' account balances at the end of the last year,patients' medical records at the end of the current month.
-
----
-# Cross Sectional vs. Time Series Data
-
--   Time Series Data: One single object (product, country, sensor, ..) observed over multiple equally-spaced time periods
-
----
-# Cross Sectional vs. Time Series Data
-
--   Time Series Data: One single object (product, country, sensor, ..) observed over multiple equally-spaced time periods
-
--   Examples: quarterly Italian GDP of the last 10 years, weekly supermarket sales of the previous year, yesterday's hourly temperature measurements.
-
----
-# Examples
-
-![](images/ts1.png)
-
----
-# Examples
-
-![](images/ts2.png)
-
----
-# Examples
-
-![](images/ts3.png)
-
----
-# Examples
-
-![](images/ts4.png)
-
----
-# Examples
-
-![](images/ts5.png)
-
----
-# Examples
-
-```{r}
-# define data
-library(ggfortify)
-library(tidyverse)
-library(xts)
-library(fpp2)
-library(TTR)
-sales=BJsales
-earnings=JohnsonJohnson
-nile=Nile
-url="http://www.cru.uea.ac.uk/cru/data/temperature/CRUTEM3v-gl.dat"
-f=read.table(url,fill=TRUE)
-ny=nrow(f)/2;x=c(t(f[2*1:ny-1,2:13]))
-temperature=ts(x,start=2019,frequency=12,end=c(2020,1))
-autoplot(temperature)+ ggtitle("World Temperature")
-```
-
----
-# What to do with time series?
-
--   Understanding of specific series features or pattern
-
--   Forecasting
-
-
----
-# White Noise
-
----
-# Stationary
-
--   A time series $y_t$ is stationary if
-
-    -   $E(y_t) = constant$
-
-    -   $Cov(y_t, y_s)$ only depends on the time lag $|t-s|$
-
--   If $y_t$ is stationary then $Var(y_t) = Constant$
-
----
-# Example
-
-```{r}
-set.seed(30)
-n = 100
-e <- ts(rnorm(n, sd = 10))
-t = c(1:n)
-y = 2*t+3+e
-library(ggfortify)
-autoplot(y) + ggtitle("")
-```
-
----
-# Example
-
-```{r}
-set.seed(30)
-n = 100
-e <- ts(rnorm(n, sd = 10))
-t = c(1:n)
-y = 2*t+3+e
-library(ggfortify)
-autoplot(y) + ggtitle("Non-stationary due to non-constant expected value")
-```
-
----
-# Example
-
-```{r}
-set.seed(30)
-n = 100
-e1 <- rnorm(n, sd = 1)
-e2 <- rnorm(n, sd = 10)
-e3 <- rnorm(n, sd = 50)
-y = c(e1,e2,e3)
-library(ggfortify)
-autoplot(ts(y)) + ggtitle("")
-```
-
----
-# Example
-
-```{r}
-set.seed(30)
-n = 100
-e1 <- rnorm(n, sd = 1)
-e2 <- rnorm(n, sd = 10)
-e3 <- rnorm(n, sd = 50)
-y = ts(c(e1,e2,e3))
-library(ggfortify)
-autoplot(y) + ggtitle("Non-stationary due to non-constant variance")
-```
-
----
-# Example
-
-```{r}
-set.seed(10)
-y <- ts(rnorm(200))
-library(ggfortify)
-autoplot(y) + ggtitle("")
-```
-
----
-# Example
-
-- White Noise is stationary
-
-```{r}
-set.seed(10)
-y <- ts(rnorm(200))
-library(ggfortify)
-autoplot(y) + ggtitle("A Stationary Time Series")
-```
-
-
----
-# Example
-
-- Random Walk is not stationary
-
-
-```{r}
-set.seed(10)
-y <- arima.sim(list(order=c(0,1,0)), n=1000)
-library(ggfortify)
-autoplot(y) + ggtitle("A Non-Stationary Time Series")
-```
-
----
-
-- Series with trend or seasonality are not stationary
-
-
-
-
-# White Noise
-
--   $y_t$ is a white-noise process (series) if $y_1$, $y_2$,..., $y_t$ are independent identical distributed (iid) zero mean random variables from a certain distribution (usually normal)
-
----
-# Example
-
-```{r}
-set.seed(30)
-y <- ts(rnorm(100))
-library(ggfortify)
-autoplot(y) + ggtitle("White noise of Standard Normal Distribution")
-```
----
-# Example
-
-```{r}
-set.seed(30)
-
-y = sample(c(-1, 1), 100, replace = TRUE)
-
-y <- ts(y)
-library(ggfortify)
-autoplot(y) + ggtitle("White noise of Tossing a Coin")
-```
----
-# Correlogram
-
-- Autocorrelation lag with lag k is the the correlation between the time series $y_t$ and $y_{t-k}$
-
-![](images/acf.png)
-
-- Autocorrelation lag with lag 0 is always 1
-
-- The Correlogram is the plot of the autocorrelations for values of lag k = 0, 1, 2,...
-
----
-# Correlogram a white noise
-
-- Correlogram of a white noise
-
-```{r}
-# create a white-noise time series
-y = ts(rnorm(100))
-
-# plot its ACF or correlogram 
-acf(y)
-```
-
----
-# Correlogram a white noise
-
-```{r}
-set.seed(30)
-y = sample(c(-1, 1), 100, replace = TRUE)
-
-y <- ts(y)
-
-acf(y)
-
-```
-
----
-# Correlogram a time series with trend
-
-- Usually a trend in the data will show in the correlogram as a slow decay in the autocorrelation
-
-```{r}
-y = ts(c(1:100))
-acf(y)
-```
-
----
-# The Correlogram - Example
-
-```{r}
-y = ts(cos(c(1:100))+rnorm(100))
-acf(y)
-```
-
----
-# ACF of a time series with seasonality
-
-```{r}
-set.seed(30)
-y = cos(1:100)
-y <- ts(y)
-acf(y)
-```
-
-
-
----
-# Three Components of Time Series
+# Time series decomposition
 
 
 ---
 # Time Series Patterns
 
-A time series may consist of 
+A time series may consist of
 
-- trend, 
+-   trend,
 
-- seasonality and 
+-   seasonality and
 
-- cycles
+-   cycles
 
 ---
+
 # Trend
 
-- A trend is a long-term increase or decrease in the data. 
+-   A trend is a long-term increase or decrease in the data.
 
-- Trend does not have to be linear. 
+-   Trend does not have to be linear.
 
-- Sometimes we will refer to a trend as âchanging directionâ, when it might go from an increasing trend to a decreasing trend. 
+-   Sometimes we will refer to a trend as âchanging directionâ, when it might go from an increasing trend to a decreasing trend.
 
 ---
 # Examples
 
 ![](images/ts6.png)
 
-- The US treasury bill contracts show results from the Chicago market for 100 consecutive trading days in 1981. There is a downward trend
+-   The US treasury bill contracts show results from the Chicago market for 100 consecutive trading days in 1981. There is a downward trend
 
 ---
 # Examples
 
 ![](images/ts7.png)
 
-- There is no apparent trend in the data over this period
+-   There is no apparent trend in the data over this period
 
+---
 # Cycle and Seasonal
 
-- cycle: repeated events over time that are not equally spaced
+-   cycle: repeated events over time that are not equally spaced
 
-- seasonal: repeated events over time that are equally spaced
-
+-   seasonal: repeated events over time that are equally spaced
 
 ---
 # Examples
 
 ![](images/ts7.png)
 
-- The monthly housing sales show strong seasonality within each year, as well as some strong cyclic behaviour with a period of about 6â10 years
-
+-   The monthly housing sales show strong seasonality within each year, as well as some strong cyclic behaviour with a period of about 6â10 years
 
 ---
 # Examples
@@ -457,13 +179,294 @@ The Australian quarterly electricity production shows a strong increasing trend,
 
 ![](images/ts9.png)
 
-- No trend, seasonality or cyclic behaviour. There are random fluctuations which do not appear to be very predictable, and no strong patterns that would help with developing a forecasting model.
-
+-   No trend, seasonality or cyclic behaviour. There are random fluctuations which do not appear to be very predictable, and no strong patterns that would help with developing a forecasting model.
 
 ---
 # Time series decomposition
 
-- When we decompose a time series into components, we usually combine the trend and cycle into a single trend-cycle component (sometimes called the trend for simplicity). 
+-   When we decompose a time series into components, we usually combine the trend and cycle into a single trend-cycle component (sometimes called the trend for simplicity).
 
-- Three components: a trend-cycle component, a seasonal component, and a remainder component (containing anything else in the time series).
+-   Three components: a trend-cycle component, a seasonal component, and a remainder component (containing anything else in the time series).
 
+---
+# Two decompositions
+
+-   Additive Decomposition
+
+$$
+y_t = S_t + T_t + R_t
+$$
+
+-   Multiplicative decomposition
+
+$$
+y_t = S_t\times T_t \times R_t
+$$
+
+---
+# Relationship
+
+-   The log transformation will turn a multiplicative model to additive model.
+
+---
+# Central MA vs. MA
+
+[Link](https://tjeld.uia.no/shiny/valeriz/centered-vs-right/#:~:text=The%20turning%20point%20in%20a,the%20greater%20the%20lag%20time).
+
+---
+# Classical Decomposition
+
+-   Trend Estimate: Smooth the data using centred moving average (CMA) of the order equal to the periodicity of the data
+
+-   Detrend the data: calculate the detrended series by subtracting/dividing the trend estimate
+
+-   Seasonal Estimate: Average value for each period is calculated based on the de-trended series.
+
+-   Random/Remainder: subtract from the series the trend and seasonal component estimations
+
+---
+# Examples
+
+```{r}
+data("AirPassengers")
+plot(AirPassengers)
+```
+
+---
+# Examples
+
+```{r}
+ourDecomposition <- decompose(AirPassengers, type="additive")
+plot(ourDecomposition)
+```
+
+---
+# Examples
+
+```{r}
+ourDecomposition <- decompose(AirPassengers, type="multiplicative")
+plot(ourDecomposition)
+```
+
+---
+# Examples
+
+```{r, echo=TRUE}
+y <- ts(c(1:100) + 
+          50*cos(seq(0,16*pi,length.out=100)) + 
+          rnorm(100,0,10),frequency=12)
+```
+
+---
+# Examples
+
+```{r}
+y <- ts(c(1:100) + 50*cos(seq(0,16*pi,length.out=100)) + rnorm(100,0,10),frequency=12)
+ourDecomposition <- decompose(y, type="additive")
+plot(ourDecomposition)
+```
+
+---
+# STL Decomposition
+
+-   Classical Decomposition uses Central Moving Average to estimate the trend
+
+-   STL uses LOESS (locally estimated scatterplot smoothing) to estimate the trend
+
+-   [Link](https://www.wessa.net/download/stl.pdf)
+
+-   The seasonal component is estimated using moving averages of the de-trend series
+
+---
+# STL Decomposition
+
+-   STL is a versatile and robust method for decomposing time series
+
+-   STL can be implemented using `stl` function
+
+---
+# STL Decomposition
+
+```{r, eval=FALSE, echo=TRUE}
+data("AirPassengers")
+stl_Decomposition <- stl(AirPassengers, 
+                        s.window = "periodic")
+plot(stl_Decomposition)
+```
+
+---
+# STL Decomposition
+
+```{r, echo=FALSE}
+data("AirPassengers")
+ourDecomposition <- stl(AirPassengers, s.window = "periodic")
+plot(ourDecomposition)
+```
+
+---
+# Other Decomposition Methods
+
+-   X-11 decomposition: originated in the US Census Bureau and Statistics Canada
+
+-   SEATS decomposition: developed at the Bank of Spain, and is now widely used by government agencies around the world
+
+---
+# Forecasting with Exponential Smoothing
+
+- Single ES: constant level (no trend) and no seasonality
+
+- Holt’s Exponential Smoothing (Using double ES): has trend and no seasonality. 
+
+- Holt-Winters Exponential Smoothing (Using triple ES): has trend and seasonality. 
+
+---
+class: inverse, center, middle
+
+# Forecasting with Single Exponential Smoothing
+
+- constant level (no trend) and no seasonality
+
+---
+# Forecasting with Single Exponential Smoothing
+
+```{r, eval=FALSE}
+library(forecast)
+rain <- read.csv('data/rainfall_london.csv')
+ts1 <- ts(rain,start=c(1813))
+plot(ts1)
+```
+
+
+
+
+---
+# Forecasting with Single Exponential Smoothing
+
+```{r, echo=FALSE}
+library(forecast)
+rain <- read.csv('data/rainfall_london.csv')
+ts1 <- ts(rain,start=c(1813))
+plot(ts1)
+```
+
+
+---
+# Making Forecast
+
+```{r}
+ts1_forecast <- HoltWinters(ts1, alpha=TRUE, 
+                            beta=FALSE, 
+                            gamma=FALSE)
+ts1_forecast
+```
+
+---
+# Making Forecast
+
+```{r}
+plot(ts1_forecast)
+```
+
+---
+### Forecasting
+
+```{r}
+ts1_forecast2 <- forecast(ts1_forecast, h=8)
+ts1_forecast2
+```
+
+---
+```{r}
+plot(ts1_forecast2)
+```
+
+
+---
+class: center, middle, inverse
+
+# Holt’s Exponential Smoothing
+
+---
+**Holt’s Exponential Smoothing**
+
+```{r}
+skirts <- read.csv('data/skirts.csv')
+ts2 <- ts(skirts,start=c(1866))
+plot(ts2)
+```
+
+---
+
+```{r}
+ts2_forecast <- HoltWinters(ts2, alpha=TRUE, 
+                            beta=TRUE, 
+                            gamma=FALSE)
+ts2_forecast
+```
+
+---
+
+```{r}
+plot(ts2_forecast)
+```
+
+---
+
+```{r}
+ts2_forecast2 <- forecast(ts2_forecast, h=19)
+plot(ts2_forecast2)
+```
+
+---
+class: center, inverse, middle
+
+# Holt-Winters Exponential Smoothing
+
+---
+```{r}
+souvenir <- read.csv('data/souvenir.csv')
+ts3 <- ts(souvenir, frequency=12, start=c(1987,1))
+plot(ts3)
+```
+
+
+---
+```{r}
+ts3_forecasts <- HoltWinters(ts3, alpha=TRUE, 
+                            beta=TRUE, 
+                            gamma=TRUE)
+plot(ts3_forecasts)
+```
+
+
+---
+```{r}
+ts3_forecasts2 <- forecast(ts3_forecasts, h=48)
+plot(ts3_forecasts2)
+```
+
+
+---
+
+```{r, eval=FALSE}
+souvenir <- read.csv('data/souvenir.csv')
+ts3 <- ts(souvenir, frequency=12, start=c(1987,1))
+logts3 <- log(ts3)
+ts3_forecasts <- HoltWinters(logts3)
+plot(ts3_forecasts)
+ts3_forecasts2 <- forecast(ts3_forecasts, h=48)
+plot(ts3_forecasts2)
+```
+
+
+---
+
+- The parameters alpha, beta and gamma all have values between 0 and 1.
+
+- Values that are close to 0 mean that relatively little weight is placed on the most recent observations (the weights are spread out for the past observations) when making forecasts of future values.
+
+- Alpha estimates the level
+
+- Beta estimate the slopes of the trend component
+
+- Gamma estimate the slope of the seasonal component

@@ -1,0 +1,92 @@
+---
+title: "AYU - Pod Week 3"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+### Instruction
+
+1.  *Download the Rmarkdown file at [this link](ayu_pod_submission.Rmd)*
+
+2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+4.  *Submit the pdf/Word to Canvas.*
+
+[Video Instruction](https://drive.google.com/file/d/1-iswKjJpGn_fF3XOtyI__taRhEGX4OMw/view). 
+
+------------------------------------------------------------------------
+
+## Question 1
+
+-   Use the following codes to plot the Airline Passenger data and its additive decomposition
+
+```{r, eval=FALSE}
+data("AirPassengers")
+plot(AirPassengers)
+ourDecomposition <- decompose(AirPassengers, type="additive")
+plot(ourDecomposition)
+```
+
+-   Change `additive` to `multiplicative` to plot the multiplicative decomposition
+
+-   Plot the [Electric_Production](data/Electric_Production.csv) and its decomposition (*Notice: You need to use function `ts` to create the time series first*)
+
+-   Plot the [Electric_Production](data/Electric_Production.csv) from 1985 to 1995 and its decomposition
+
+```{r, eval=FALSE, echo=FALSE}
+d =  read.csv('data/Electric_Production.csv')
+t2 = ts(d$IPG2211A2N, start = 1985, end = 1995, frequency = 12)
+ourDecomposition <- decompose(t2, type="additive")
+plot(ourDecomposition)
+```
+
+-   Include your codes in an Rmarkdown or Quarto, Knit it to either pdf or Word document. Submit the file to Canvas.
+
+
+## Question 2
+
+- Use the following codes to plot the Airline Passenger data and its STL decomposition
+
+```{r, eval=FALSE}
+data("AirPassengers")
+plot(AirPassengers)
+ourDecomposition <- stl(AirPassengers, s.window = "periodic")
+plot(ourDecomposition)
+```
+
+- Plot the [Electric Production](data/Electric_Production.csv) and its stl decomposition (*Notice: You need to use function `ts` to create the time series first*)
+
+- Plot the [Electric Production](data/Electric_Production.csv) from 1985 to 1995 and its stl decomposition
+
+```{r, eval=FALSE, echo=FALSE}
+d =  read.csv('data/Electric_Production.csv')
+t2 = ts(d$IPG2211A2N, start = 1985, end = 1995, frequency = 12)
+ourDecomposition <- decompose(t2, type="additive")
+plot(ourDecomposition)
+```
+
+- Plot the [US Retail Employment](data/us_retail_employment.csv) and its STL decomposition. 
+
+- Find your own time series that has a seasonal component and plot the classical decomposition (as in Assignment 3) and the STL decomposition. 
+
+## Question 3
+
+1. Run the codes in the [slides](https://bryantstats.github.io/math475/slides/5.html#1) to reproduce the results. The links to the datasets used in the slides are as follows.
+
+  - [rainfall_london.csv](https://bryantstats.github.io/math475/slides/rainfall_london.csv)
+  
+  - [skirts.csv](https://bryantstats.github.io/math475/slides/skirts.csv)
+  
+  - [souvenir.csv](https://bryantstats.github.io/math475/slides/souvenir.csv)
+
+2. Find three examples of the below time series and make forecast using Exponential Smoothing
+
+- Time series with no trend and no seasonality
+- Time series with trend and no seasonality
+- Time series with trend and seasonality
+
+---
