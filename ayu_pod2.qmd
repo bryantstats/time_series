@@ -20,7 +20,7 @@ editor: visual
 
 ------------------------------------------------------------------------
 
-**Question 1** 
+## Question 1
 
 Use the following code to plot a time series and a moving average series. 
 
@@ -63,7 +63,9 @@ lines(t1_sma, col = "red")
 ```
 
 
-**Question 2.** *Trend Revealing by Visualization*
+## Question 2
+
+*Trend Revealing by Visualization*
 
 In this question, we will use R to plot a time series, create an MA series and plot the MA series.
 
@@ -99,7 +101,9 @@ lines(t1_ema, col = "red")
 
 -   Increase the value of $w$ to see the effect this parameter on the smoothing series. You can copy and paste the given codes and change the value of $w$.
 
-**Question 3.** *Trend Revealing by Visualization*
+## Question 3
+
+*Trend Revealing by Visualization*
 
 In this assignment we will study the dataset about the economy of Algeria. The dataset can be download at [this link](data/algeria_economy.csv).
 
@@ -120,3 +124,5 @@ t2_ema = EMA(t2, ratio = 1-w)
 plot(t2,  main = paste0("Exponential Smoothing with w = ", w))
 lines(t2_ema, col = "red")
 ```
+
+---

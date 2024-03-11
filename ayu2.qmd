@@ -12,7 +12,9 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = FAL
 ```
 
 
-**Question 1.** *Moving Avergare Smoothing*
+## Question 1 
+
+*Moving Avergare Smoothing*
 
 Given the following time series $y_t$. 
 
@@ -33,11 +35,13 @@ Given the following time series $y_t$.
   c. Calculate the double moving average series with  $k = 3$
   
 
-**Question 2.** *Application of MA: Forecasting Linear Trend Time Series*
+## Question 2 
+
+*Application of MA: Forecasting Linear Trend Time Series*
 
 We assume the series in question 1 has linear trend. Use double smoothing average to estimate the linear trend (slope) of the time series. Use the estimated linear trend to predict the next value ($y_8$) 
 
-**Question 3.** Exponential Smoothing
+## Question 3 
 
 Given the following time series $y_t$.
 
@@ -55,6 +59,8 @@ a.  Calculate the exponential smoothing series with $w = .2$
 
 b.  Calculate the double exponential smoothing series with $w = .2$
 
-**Question 4.** *Forecasting Linear Trend Time Series*
+## Question 4 
+
+*Forecasting Linear Trend Time Series*
 
 We assume the series in question 1 has linear trend. Use double exponential smoothing to estimate the linear trend (slope) of the time series. Use the estimated linear trend to predict the next value ($y_8$)
