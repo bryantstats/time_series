@@ -80,6 +80,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#instruction" id="toc-instruction" class="nav-link active" data-scroll-target="#instruction">Instruction</a></li>
+  <li><a href="#question-1." id="toc-question-1." class="nav-link" data-scroll-target="#question-1.">Question 1.</a></li>
+  <li><a href="#question-2." id="toc-question-2." class="nav-link" data-scroll-target="#question-2.">Question 2.</a></li>
+  <li><a href="#question-3." id="toc-question-3." class="nav-link" data-scroll-target="#question-3.">Question 3.</a></li>
+  <li><a href="#question-4" id="toc-question-4" class="nav-link" data-scroll-target="#question-4">Question 4</a></li>
   </ul>
 </nav>
 </div>
@@ -104,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>In this POD assignment, we will use R to compute the single linear model and view its summary result. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.</p>
+<p>In this POD assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.</p>
 <p>In this first POD assignment, please watch the instruction video to understand how you should do the assignment and submit them to Canvas for grading.</p>
 <hr>
 <section id="instruction" class="level3">
@@ -126,24 +130,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><em>Submit the pdf to Canvas.</em></p></li>
 </ol>
 <hr>
+</section>
+<section id="question-1." class="level2">
+<h2 class="anchored" data-anchor-id="question-1.">Question 1.</h2>
+<p>Use the codes given in the slides to</p>
+<ul>
+<li><p>Generate a white noise of 1000 observations from the standard normal distribution</p></li>
+<li><p>Generate a white noise of 1000 observations from the chi-square distribution. Use the function <code>rchisq</code> to generate random sample from the chi-square distribution</p></li>
+</ul>
+</section>
+<section id="question-2." class="level2">
+<h2 class="anchored" data-anchor-id="question-2.">Question 2.</h2>
+<p>The following codes is to read then plot a time series from a CSV file using the <code>ts</code> function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'TTR'</span>) <span class="co"># install TTR package</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TTR)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># read data</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/math475/data/MedCPISmooth.csv'</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">=</span> <span class="fu">ts</span>(d<span class="sc">$</span>PerMEDCPI, <span class="at">start =</span> <span class="dv">1947</span>, <span class="at">frequency =</span> <span class="dv">4</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the time series</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t1, <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Medical Component of the CPI"</span>))</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># create a moving average series</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>k <span class="ot">=</span> <span class="dv">16</span>  <span class="co"># set the moving average </span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>t1_sma <span class="ot">=</span> <span class="fu">SMA</span>(t1, <span class="at">n =</span> k)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the moving average series</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t1_sma, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TTR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># read data</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/math475/data/MedCPISmooth.csv'</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">=</span> <span class="fu">ts</span>(d<span class="sc">$</span>PerMEDCPI, <span class="at">start =</span> <span class="dv">1947</span>, <span class="at">frequency =</span> <span class="dv">4</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the time series</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t1, <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Medical Component of the CPI"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Apply the above codes to read then plot the series from <a href="https://bryantstats.github.io/math475/data/yearly_MedCPI.csv">yearly medical expense.</a></p>
+</section>
+<section id="question-3." class="level2">
+<h2 class="anchored" data-anchor-id="question-3.">Question 3.</h2>
+<p>Use the <code>acf</code> function to plot the ACF of the time series in the above question.</p>
+</section>
+<section id="question-4" class="level2">
+<h2 class="anchored" data-anchor-id="question-4">Question 4</h2>
+<p>Import a time series data of your own. Plot the series and the auto-correlation function of the series. Does your time series have a trend or seasonal component?</p>
 </section>
 
 </main>

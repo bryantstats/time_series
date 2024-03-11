@@ -10,7 +10,7 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE)
 ```
 
-In this POD assignment, we will use R to compute the single linear model and view its summary result. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.
+In this POD assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.
 
 In this first POD assignment, please watch the instruction video to understand how you should do the assignment and submit them to Canvas for grading.
 
@@ -44,10 +44,20 @@ In this first POD assignment, please watch the instruction video to understand h
 
 ------------------------------------------------------------------------
 
-```{r, eval=FALSE}
+## Question 1. 
 
-install.packages('TTR') # install TTR package
+Use the codes given in the slides to
 
+- Generate a white noise of 1000 observations from the standard normal distribution 
+
+- Generate a white noise of 1000 observations from the chi-square distribution.  Use the function `rchisq` to generate random sample from the chi-square distribution
+
+
+## Question 2. 
+
+The following codes is to read then plot a time series from a CSV file using the `ts` function.
+
+```{r}
 library(TTR)
 # read data
 d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
@@ -55,29 +65,14 @@ t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
 
 # plot the time series
 plot(t1, main = paste0("Medical Component of the CPI"))
-
-# create a moving average series
-k = 16  # set the moving average 
-t1_sma = SMA(t1, n = k)
-
-# plot the moving average series
-lines(t1_sma, col = "red")
 ```
 
-```{r, eval=FALSE, echo=FALSE}
-library(TTR)
-# read data
-d <- read.csv('https://bryantstats.github.io/math475/data/yearly_MedCPI.csv')
+Apply the above codes to read then plot the series from [yearly medical expense.](https://bryantstats.github.io/math475/data/yearly_MedCPI.csv)  
 
-t1 = ts(d$yearly_MEDCPI, start = 1947, frequency = 1)
+## Question 3. 
 
-# plot the time series
-plot(t1, main = paste0("Medical Component of the CPI"))
+Use the `acf` function to plot the ACF of the time series in the above question. 
 
-# create a moving average series
-k = 4  # set the moving average 
-t1_sma = SMA(t1, n = k)
+## Question 4
 
-# plot the moving average series
-lines(t1_sma, col = "red")
-```
+Import a time series data of your own. Plot the series and the auto-correlation function of the series.  Does your time series have a trend or seasonal component?

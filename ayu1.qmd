@@ -11,19 +11,61 @@ editor: visual
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE)
 ```
 
+------------------------------------------------------------------------
 
-**Question 1.** White-Noise
+**Instruction**: *Scan your answer into pdf/word document then submit to Canvas.*
+---
 
-**Question 2.** Stationary
+## Question 1
 
-**Question 3.** ACF
+Let $y_t = 3 + \epsilon_t$, where $\epsilon_t$ is the face value of rolling a fair die.  
 
-**Question 4.** Components of a Time Series
+## Question 2 
 
+Is this following time series stationary?  Explain your answers. 
 
+a. $y_t = 1 + 2t + \epsilon_t$ where $\epsilon_t \sim N(0, 1)$
 
+b. $y_t = 3 + \epsilon_t$ where $\epsilon_t \sim N(0, t)$
 
+## Question 3 
 
+Given the following time series.
 
+| t   | $y_t$ |
+|:----|:------|
+| 1   | 1     |
+| 2   | 3     |
+| 3   | 5     |
+| 4   | 8     |
+| 5   | 12    |
+| 6   | 13    |
+| 7   | 16    |
 
+Calculate the auto-covariance at lag 1.
 
+## Question 4 
+
+Given the following time series.
+
+| t   | $y_t$ |
+|:----|:------|
+| 1   | 1     |
+| 2   | 3     |
+| 3   | 5     |
+| 4   | 8     |
+| 5   | 12    |
+| 6   | 13    |
+| 7   | 16    |
+
+Calculate the auto-correlation at lag 1.
+
+## Question 5
+
+Given $$y_t = Z_t + .8 Z_{t-2},$$ where $Z_t \sim^{iid} N(0,1)$. 
+
+a. Find the autocovariance and autocorrelation functions for this time series.
+
+b. Compute the variance of the sample mean $(X_1+X_2+X_3+X_4)/4$
+
+------------------------------------------------------------------------
