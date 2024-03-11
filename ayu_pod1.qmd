@@ -1,0 +1,83 @@
+---
+title: "AYU - Pod Week 1"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE)
+```
+
+In this POD assignment, we will use R to compute the single linear model and view its summary result. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.
+
+In this first POD assignment, please watch the instruction video to understand how you should do the assignment and submit them to Canvas for grading.
+
+------------------------------------------------------------------------
+
+### Instruction
+
+1.  *Watch this [Video Instruction](https://drive.google.com/file/d/1-iswKjJpGn_fF3XOtyI__taRhEGX4OMw/view). This video will go through the steps in this instruction to show you how to do the assignment and submit it.*
+
+2.  *Install R, Rstudio and the package `rmarkdown` as follows.*
+
+    -   *Download R at [this link](https://cran.r-project.org/bin/windows/base/)*
+
+    -   *Download Rstudio at [this link](https://posit.co/download/rstudio-desktop/)*
+
+    -   *Install R*
+
+    -   *Install Rstudio*
+
+    -   *Open Rstudio, in the console, type: `install.packages('rmarkdown')`*
+
+3.  *Download the submission Rmarkdown file at [this link](01_ayu_pod_submission.Rmd)*
+
+4.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+5.  *Answer the questions to learn about the subject. Question without the asterisk (\*) have the answers given to you. For question that have the answer, you still need to copy the codes and answer them. For question that do not have the answer, you need to create your own codes to answer the question.*
+
+6.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+7.  *Submit the pdf to Canvas.*
+
+------------------------------------------------------------------------
+
+```{r, eval=FALSE}
+
+install.packages('TTR') # install TTR package
+
+library(TTR)
+# read data
+d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
+
+# plot the time series
+plot(t1, main = paste0("Medical Component of the CPI"))
+
+# create a moving average series
+k = 16  # set the moving average 
+t1_sma = SMA(t1, n = k)
+
+# plot the moving average series
+lines(t1_sma, col = "red")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+library(TTR)
+# read data
+d <- read.csv('https://bryantstats.github.io/math475/data/yearly_MedCPI.csv')
+
+t1 = ts(d$yearly_MEDCPI, start = 1947, frequency = 1)
+
+# plot the time series
+plot(t1, main = paste0("Medical Component of the CPI"))
+
+# create a moving average series
+k = 4  # set the moving average 
+t1_sma = SMA(t1, n = k)
+
+# plot the moving average series
+lines(t1_sma, col = "red")
+```
