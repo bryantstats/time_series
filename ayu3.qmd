@@ -17,19 +17,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = FAL
 
 ---
 
-## Question 1
-
-Let $y_t = 3 + \epsilon_t$, where $\epsilon_t$ is the face value of rolling a fair die.  
-
-## Question 2 
-
-Is this following time series stationary?  Explain your answers. 
-
-a. $y_t = 1 + 2t + \epsilon_t$ where $\epsilon_t \sim N(0, 1)$
-
-b. $y_t = 3 + \epsilon_t$ where $\epsilon_t \sim N(0, t)$
-
-## Question 3 
+## Question
 
 Given the following time series.
 
@@ -42,31 +30,14 @@ Given the following time series.
 | 5   | 12    |
 | 6   | 13    |
 | 7   | 16    |
+| 8   | 20    |
+| 9   | 25    |
+| 10   | 30    |
 
-Calculate the auto-covariance at lag 1.
+a. Use simple exponential smoothing to forecast the values of $y_{11}$
 
-## Question 4 
+b. Use double exponential smoothing to forecast the values of $y_{11}$
 
-Given the following time series.
-
-| t   | $y_t$ |
-|:----|:------|
-| 1   | 1     |
-| 2   | 3     |
-| 3   | 5     |
-| 4   | 8     |
-| 5   | 12    |
-| 6   | 13    |
-| 7   | 16    |
-
-Calculate the auto-correlation at lag 1.
-
-## Question 5
-
-Given $$y_t = Z_t + .8 Z_{t-2},$$ where $Z_t \sim^{iid} N(0,1)$. 
-
-a. Find the autocovariance and autocorrelation functions for this time series.
-
-b. Compute the variance of the sample mean $(X_1+X_2+X_3+X_4)/4$
+c. Use triple exponential smoothing (Holt-Winters Method) to forecast the values of $y_{11}$
 
 ------------------------------------------------------------------------
