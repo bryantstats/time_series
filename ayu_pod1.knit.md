@@ -6,9 +6,8 @@ format:
 editor: visual
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE)
-```
+
+
 
 In this POD assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.
 
@@ -57,7 +56,10 @@ Use the codes given in the slides to
 
 The following codes is to read then plot a time series from a CSV file using the `ts` function.
 
-```{r}
+
+::: {.cell}
+
+```{.r .cell-code}
 library(TTR)
 # read data
 d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
@@ -66,6 +68,8 @@ t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
 # plot the time series
 plot(t1, main = paste0("Medical Component of the CPI"))
 ```
+:::
+
 
 Apply the above codes to read then plot the series from [yearly medical expense.](data/yearly_MedCPI.csv)  
 
