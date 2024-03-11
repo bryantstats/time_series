@@ -31,7 +31,7 @@ In this first POD assignment, please watch the instruction video to understand h
 
     -   *Open Rstudio, in the console, type: `install.packages('rmarkdown')`*
 
-3.  *Download the submission Rmarkdown file at [this link](01_ayu_pod_submission.Rmd)*
+3.  *Download the submission Rmarkdown file at [this link](ayu_pod_submission.Rmd)*
 
 4.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
 
