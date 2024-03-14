@@ -32,7 +32,7 @@ In this first R assignment, please watch the instruction video to understand how
 
     -   *Open Rstudio, in the console, type: `install.packages('rmarkdown')`*
 
-3.  *Download the submission Rmarkdown file at [this link](ayu_pod_submission.Rmd)*
+3.  *Download the submission Rmarkdown file at [this link](R_submission.Rmd)*
 
 4.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
 
@@ -44,7 +44,7 @@ In this first R assignment, please watch the instruction video to understand how
 
 ------------------------------------------------------------------------
 
-## Question 1 
+## 1. Import a Time Series
 
 The following codes is to read then plot a time series from a CSV file using the `ts` function.
 
@@ -52,19 +52,48 @@ The following codes is to read then plot a time series from a CSV file using the
 
 ```{r}
 library(TTR)
-# read data
+
+# import/read the data
 d <- read.csv('https://bryantstats.github.io/time_series/data/MedCPISmooth.csv')
-t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
+
+# make sure that the data has no missing values
+d = na.omit(d)
+
+# frequency = 4 for quarterly data, 
+# frequency = 12 for monthly data, 
+# frequency = 1 for yearly data, by default frequency = 1
+
+t1 = ts(d$PerMEDCPI, start = c(1947, 2), frequency = 4)
 
 # plot the time series
 plot(t1, main = paste0("Medical Component of the CPI"))
 ```
+We observe that the series is not stationary because the mean does change over time.
 
-Apply the above codes to read then plot the series from [yearly medical expense.](data/yearly_MedCPI.csv)  
-## Question 2. 
+Notice that 
 
-Use the `acf` function to plot the ACF of the time series in the above question. Base on the plot of the series and the ACF, do you think the series is stationary?
+- The dataset has multiple columns, but we only use the column `PerMEDCPI` as our time series.  
 
-## Question 3
+- The series is a quarterly dataset. Thus, we use the `frequency = 4` in the `ts` function. 
 
-Import a time series data of your own. Plot the series and the auto-correlation function of the series.  Does your time series have a trend or seasonal component?
+- The series start from month 6 of 1947, which is the second quarter so we set `start = c(1947, 2)`
+
+## 2. Ploting the ACF
+
+To plot the ACF of the series, we use the `acf` function. We can control the number of lags in the ACF by the parameter `lag.max`
+
+```{r}
+acf(t1, lag.max = 100)
+```
+
+We can see that the ACF does not die out to zeroes (going out of the strip). This indicates that the series is not stationary. 
+
+## 3. Questions
+
+1. Rerun all the given codes to reproduce the results. 
+
+2. Import and plot the series from [yearly medical expense.](data/yearly_MedCPI.csv)
+
+3. Use the `acf` function to plot the ACF of the time series in the above question. Base on the plot of the series and the ACF, do you think the series is stationary?
+
+4. Import a time series data of your own. Plot the series and the auto-correlation function of the series.  Does your time series have a trend or seasonal component? Is your series stationary?

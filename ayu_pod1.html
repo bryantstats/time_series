@@ -80,8 +80,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#instruction" id="toc-instruction" class="nav-link active" data-scroll-target="#instruction">Instruction</a></li>
-  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question 1</a></li>
-  <li><a href="#question-3" id="toc-question-3" class="nav-link" data-scroll-target="#question-3">Question 3</a></li>
+  <li><a href="#import-a-time-series" id="toc-import-a-time-series" class="nav-link" data-scroll-target="#import-a-time-series">1. Import a Time Series</a></li>
+  <li><a href="#ploting-the-acf" id="toc-ploting-the-acf" class="nav-link" data-scroll-target="#ploting-the-acf">2. Ploting the ACF</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions">3. Questions</a></li>
   </ul>
 </nav>
 </div>
@@ -121,7 +122,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><em>Install Rstudio</em></p></li>
 <li><p><em>Open Rstudio, in the console, type: <code>install.packages('rmarkdown')</code></em></p></li>
 </ul></li>
-<li><p><em>Download the submission Rmarkdown file at <a href="ayu_pod_submission.Rmd">this link</a></em></p></li>
+<li><p><em>Download the submission Rmarkdown file at <a href="R_submission.Rmd">this link</a></em></p></li>
 <li><p><em>Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.</em></p></li>
 <li><p><em>Answer the questions to learn about the subject. Question without the asterisk (*) have the answers given to you. For question that have the answer, you still need to copy the codes and answer them. For question that do not have the answer, you need to create your own codes to answer the question.</em></p></li>
 <li><p><em>Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -&gt; Knit to pdf) to convert the Rmarkdown file into a pdf file.</em></p></li>
@@ -129,26 +130,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <hr>
 </section>
-<section id="question-1" class="level2">
-<h2 class="anchored" data-anchor-id="question-1">Question 1</h2>
+<section id="import-a-time-series" class="level2">
+<h2 class="anchored" data-anchor-id="import-a-time-series">1. Import a Time Series</h2>
 <p>The following codes is to read then plot a time series from a CSV file using the <code>ts</code> function.</p>
-<p><a href="https://bryantstats.github.io/math475/data/MedCPISmooth.csv">Dataset</a></p>
+<p><a href="https://bryantstats.github.io/time_series/data/MedCPISmooth.csv">Dataset</a></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TTR)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># read data</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/math475/data/MedCPISmooth.csv'</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">=</span> <span class="fu">ts</span>(d<span class="sc">$</span>PerMEDCPI, <span class="at">start =</span> <span class="dv">1947</span>, <span class="at">frequency =</span> <span class="dv">4</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># import/read the data</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/time_series/data/MedCPISmooth.csv'</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the time series</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t1, <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Medical Component of the CPI"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># make sure that the data has no missing values</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>d <span class="ot">=</span> <span class="fu">na.omit</span>(d)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># frequency = 4 for quarterly data, </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># frequency = 12 for monthly data, </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># frequency = 1 for yearly data, by default frequency = 1</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">=</span> <span class="fu">ts</span>(d<span class="sc">$</span>PerMEDCPI, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">1947</span>, <span class="dv">2</span>), <span class="at">frequency =</span> <span class="dv">4</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the time series</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t1, <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">"Medical Component of the CPI"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Apply the above codes to read then plot the series from <a href="data/yearly_MedCPI.csv">yearly medical expense.</a><br>
-## Question 2.</p>
-<p>Use the <code>acf</code> function to plot the ACF of the time series in the above question. Base on the plot of the series and the ACF, do you think the series is stationary?</p>
+<p>We observe that the series is not stationary because the mean does change over time.</p>
+<p>Notice that</p>
+<ul>
+<li><p>The dataset has multiple columns, but we only use the column <code>PerMEDCPI</code> as our time series.</p></li>
+<li><p>The series is a quarterly dataset. Thus, we use the <code>frequency = 4</code> in the <code>ts</code> function.</p></li>
+<li><p>The series start from month 6 of 1947, which is the second quarter so we set <code>start = c(1947, 2)</code></p></li>
+</ul>
 </section>
-<section id="question-3" class="level2">
-<h2 class="anchored" data-anchor-id="question-3">Question 3</h2>
-<p>Import a time series data of your own. Plot the series and the auto-correlation function of the series. Does your time series have a trend or seasonal component?</p>
+<section id="ploting-the-acf" class="level2">
+<h2 class="anchored" data-anchor-id="ploting-the-acf">2. Ploting the ACF</h2>
+<p>To plot the ACF of the series, we use the <code>acf</code> function. We can control the number of lags in the ACF by the parameter <code>lag.max</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">acf</span>(t1, <span class="at">lag.max =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can see that the ACF does not die out to zeroes (going out of the strip). This indicates that the series is not stationary.</p>
+</section>
+<section id="questions" class="level2">
+<h2 class="anchored" data-anchor-id="questions">3. Questions</h2>
+<ol type="1">
+<li><p>Rerun all the given codes to reproduce the results.</p></li>
+<li><p>Import and plot the series from <a href="data/yearly_MedCPI.csv">yearly medical expense.</a></p></li>
+<li><p>Use the <code>acf</code> function to plot the ACF of the time series in the above question. Base on the plot of the series and the ACF, do you think the series is stationary?</p></li>
+<li><p>Import a time series data of your own. Plot the series and the auto-correlation function of the series. Does your time series have a trend or seasonal component? Is your series stationary?</p></li>
+</ol>
 </section>
 
 </main>
