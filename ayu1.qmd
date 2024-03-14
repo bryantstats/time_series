@@ -8,7 +8,7 @@ editor: visual
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 ```
 
 ------------------------------------------------------------------------
@@ -16,35 +16,40 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = FAL
 **Instruction**: *Scan your answer into pdf/word document then submit to Canvas.*
 ---
 
+- Three Components of Time Series
+
+- Autocorrelation and ACF
+
+- Stationary
+
+- White-Noise
+
 ## Question 1
 
-Let $y_t = 3 + \epsilon_t$, where $\epsilon_t$ is the face value of rolling a fair die.  
+Given the following four time series, y1, y2, y3 and y4. Which of the time following time series
 
-## Question 2 
+- has/have trend only
 
-Is this following time series stationary?  Explain your answers. 
+- has/have seasonality only
 
-a. $y_t = 1 + 2t + \epsilon_t$ where $\epsilon_t \sim N(0, 1)$
+- has/have both trend and seasonality
 
-b. $y_t = 3 + \epsilon_t$ where $\epsilon_t \sim N(0, t)$
+- has/have no trend and no seasonality
 
-## Question 3 
+```{r}
+y1 = ts(1 + rnorm(100, sd = 1))
+y2 = ts(c(1:100)+rnorm(100, sd = 1))
+y3 = ts(10*cos(.3*c(1:100))+rnorm(100, sd = 1))
+y4 = ts(c(1:100)+ 7*cos(c(1:100))+rnorm(100, sd = 1))
 
-Given the following time series.
+plot(y1)
+plot(y2)
+plot(y3)
+plot(y4)
+```
 
-| t   | $y_t$ |
-|:----|:------|
-| 1   | 1     |
-| 2   | 3     |
-| 3   | 5     |
-| 4   | 8     |
-| 5   | 12    |
-| 6   | 13    |
-| 7   | 16    |
 
-Calculate the auto-covariance at lag 1.
-
-## Question 4 
+## Question 2
 
 Given the following time series.
 
@@ -58,14 +63,46 @@ Given the following time series.
 | 6   | 13    |
 | 7   | 16    |
 
-Calculate the auto-correlation at lag 1.
+a. Calculate the auto-correlation at lag 1.
 
-## Question 5
+b. Calculate the auto-correlation at lag 2.
 
-Given $$y_t = Z_t + .8 Z_{t-2},$$ where $Z_t \sim^{iid} N(0,1)$. 
+c. Calculate the auto-correlation at lag 3.
 
-a. Find the autocovariance and autocorrelation functions for this time series.
+## Question 3
 
-b. Compute the variance of the sample mean $(X_1+X_2+X_3+X_4)/4$
+Which of the following series is not stationary. Explain the reason. 
+
+```{r}
+y1 = ts(1 + rnorm(100, sd = 1))
+y2 = ts(c(1:100)+rnorm(100, sd = 1))
+y3 = ts(c(1:100)+10*cos(.3*c(1:100))+rnorm(100, sd = 1))
+y4 = ts(c(rnorm(50), rnorm(50, sd =10)))
+
+plot(y1)
+plot(y2)
+plot(y3)
+plot(y4)
+```
+
+
+## Question 4
+
+The ACF of several time series are given below.  Based on the ACF, which time series is/are stationary and why?
+
+```{r}
+set.seed(2024)
+y1 = ts(1 + rnorm(100, sd = 1))
+y2 = ts(c(1:100)+rnorm(100, sd = 1))
+y3 = ts(-c(1:100)+10*cos(.3*c(1:100))+rnorm(100, sd = 1))
+y4 = arima.sim(list(order=c(1,0,0), ar=c(.6)), n=100)
+y5 = ts(5*cos(c(1:100))+ rnorm(100))
+  
+acf(y1)
+acf(y2)
+acf(y3)
+acf(y4)
+acf(y5)
+```
 
 ------------------------------------------------------------------------

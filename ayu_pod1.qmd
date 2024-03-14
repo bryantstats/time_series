@@ -10,9 +10,9 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE)
 ```
 
-In this POD assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.
+In this R assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.
 
-In this first POD assignment, please watch the instruction video to understand how you should do the assignment and submit them to Canvas for grading.
+In this first R assignment, please watch the instruction video to understand how you should do the assignment and submit them to Canvas for grading.
 
 ------------------------------------------------------------------------
 
@@ -44,23 +44,16 @@ In this first POD assignment, please watch the instruction video to understand h
 
 ------------------------------------------------------------------------
 
-## Question 1. 
-
-Use the codes given in the slides to
-
-- Generate a white noise of 1000 observations from the standard normal distribution 
-
-- Generate a white noise of 1000 observations from the chi-square distribution.  Use the function `rchisq` to generate random sample from the chi-square distribution
-
-
-## Question 2. 
+## Question 1 
 
 The following codes is to read then plot a time series from a CSV file using the `ts` function.
+
+[Dataset](https://bryantstats.github.io/time_series/data/MedCPISmooth.csv)
 
 ```{r}
 library(TTR)
 # read data
-d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
+d <- read.csv('https://bryantstats.github.io/time_series/data/MedCPISmooth.csv')
 t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
 
 # plot the time series
@@ -68,11 +61,10 @@ plot(t1, main = paste0("Medical Component of the CPI"))
 ```
 
 Apply the above codes to read then plot the series from [yearly medical expense.](data/yearly_MedCPI.csv)  
+## Question 2. 
 
-## Question 3. 
+Use the `acf` function to plot the ACF of the time series in the above question. Base on the plot of the series and the ACF, do you think the series is stationary?
 
-Use the `acf` function to plot the ACF of the time series in the above question. 
-
-## Question 4
+## Question 3
 
 Import a time series data of your own. Plot the series and the auto-correlation function of the series.  Does your time series have a trend or seasonal component?
