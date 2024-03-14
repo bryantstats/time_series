@@ -36,9 +36,9 @@ In this first R assignment, please watch the instruction video to understand how
 
 4.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
 
-5.  *Answer the questions to learn about the subject. Question without the asterisk (\*) have the answers given to you. For question that have the answer, you still need to copy the codes and answer them. For question that do not have the answer, you need to create your own codes to answer the question.*
+5.  *Write codes in the code chunks to answer the questions.*
 
-6.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a Word/pdf file.*
+6.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf or Word) to convert the Rmarkdown file into a Word/pdf file.*
 
 7.  *Submit the Word/pdf to Canvas.*
 
