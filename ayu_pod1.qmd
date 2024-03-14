@@ -18,7 +18,7 @@ In this first R assignment, please watch the instruction video to understand how
 
 ### Instruction
 
-1.  *Watch this [Video Instruction](https://drive.google.com/file/d/1-iswKjJpGn_fF3XOtyI__taRhEGX4OMw/view). This video will go through the steps in this instruction to show you how to do the assignment and submit it.*
+1.  *Watch this [Video Instruction](https://bryant.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1801b84d-b4c8-4116-9e5d-b133005fe750). This video will go through the steps in this instruction to show you how to do the assignment and submit it.*
 
 2.  *Install R, Rstudio and the package `rmarkdown` as follows.*
 
