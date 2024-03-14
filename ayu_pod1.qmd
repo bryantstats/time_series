@@ -1,5 +1,5 @@
 ---
-title: "AYU - Pod Week 1"
+title: "R - Assignment 1"
 format: 
   html: 
     toc: true
@@ -10,7 +10,7 @@ editor: visual
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE)
 ```
 
-In this R assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our POD assignments, we will use R to implement the methods that we cover during the week.
+In this R assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our R assignments, we will use R to implement the methods that we cover during the week.
 
 In this first R assignment, please watch the instruction video to understand how you should do the assignment and submit them to Canvas for grading.
 
