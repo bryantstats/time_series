@@ -119,7 +119,7 @@ library(forecast)
 
 - Three Components of Time Series
 
-- Autocorrelation and ACF
+- Auto-correlation and ACF
 
 - Stationary
 
@@ -290,28 +290,28 @@ class: inverse, center, middle
 # Correlogram and ACF
 
 ---
-# Correlation and Autocorrelation
+# Correlation and Auto-correlation
 
 - The correlation between two variables measure how strong the linear relation between them. 
 
-- The correlation between a time series $y_t$ and the yesterday's version of itself $y_{t-1}$ is call autocorrelation at lag 1. 
+- The correlation between a time series $y_t$ and the yesterday's version of itself $y_{t-1}$ is call Auto-correlation at lag 1. 
 
-- Autocorrelation lag with lag $k$ is the the correlation between the time series $y_t$ and $y_{t-k}$
+- Auto-correlation lag with lag $k$ is the the correlation between the time series $y_t$ and $y_{t-k}$
 
-- Autocovariance at lag $k$ is
+- Auto-correlation at lag $k$ is
 
 ![](images/acf2.png)
 
 ---
-# Correlation and Autocorrelation
+# Correlation and Auto-correlation
 
-- Autocorrelation lag with lag k is the the correlation between the time series $y_t$ and $y_{t-k}$
+- Auto-correlation lag with lag k is the the correlation between the time series $y_t$ and $y_{t-k}$
 
-- Autocorrelation lag with lag 0 is always 1
+- Auto-correlation lag with lag 0 is always 1
 
-- The Correlogram is the plot of the autocorrelations for values of lag k = 0, 1, 2,...
+- The Correlogram is the plot of the Auto-correlations for values of lag k = 0, 1, 2,...
 
-- The Autocorrelation function (ACF) is the function where the input is a lag and the output is the autocorrelation of the lag. 
+- The Auto-correlation function (ACF) is the function where the input is a lag and the output is the Auto-correlation of the lag. 
 
 ---
 # Problem 1
@@ -373,7 +373,7 @@ Calculate the auto-correlation at lag 1 ( $r_1$ ) and at lag 2 ( $r_2$ )
 ---
 # Correlogram a time series with trend
 
-- Usually a trend in the data will show in the correlogram as a slow decay in the autocorrelation
+- Usually a trend in the data will show in the correlogram as a slow decay in the Auto-correlation
 
 ```{r}
 y = ts(c(1:100))
