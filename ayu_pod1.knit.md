@@ -6,9 +6,8 @@ format:
 editor: visual
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE)
-```
+
+
 
 In this R assignment, we will use R to work with time series objects. R is the most popular statistical programming language and in each of our R assignments, we will use R to implement the methods that we cover during the week.
 
@@ -50,7 +49,10 @@ The following codes is to read then plot a time series from a CSV file using the
 
 [Dataset](https://bryantstats.github.io/time_series/data/MedCPISmooth.csv)
 
-```{r}
+
+::: {.cell}
+
+```{.r .cell-code}
 library(TTR)
 
 # import/read the data
@@ -68,6 +70,8 @@ t1 = ts(d$PerMEDCPI, start = c(1947, 2), frequency = 4)
 # plot the time series
 plot(t1, main = paste0("Medical Component of the CPI"))
 ```
+:::
+
 
 We observe that the series is not stationary because the mean does change over time.
 
@@ -75,11 +79,16 @@ Notice that
 
 - We can download the dataset to our computer and read the file from the computer using 
 
-```{r, eval=FALSE}
+
+::: {.cell}
+
+```{.r .cell-code}
 # make sure that the dataset is in the same folder as the Rmarkdown file when knitting or at the current working directory
 
 d <- read.csv('MedCPISmooth.csv')
 ```
+:::
+
 
 Please also make sure that the dataset is in the same folder as the Rmarkdown file if the codes in an Rmarkdown or at the current working directory if the codes is excuted in the console. 
 
@@ -93,9 +102,14 @@ Please also make sure that the dataset is in the same folder as the Rmarkdown fi
 
 To plot the ACF of the series, we use the `acf` function. We can control the number of lags in the ACF by the parameter `lag.max`
 
-```{r}
+
+::: {.cell}
+
+```{.r .cell-code}
 acf(t1, lag.max = 100)
 ```
+:::
+
 
 We can see that the ACF does not die out to zeroes (going out of the strip). This indicates that the series is not stationary. 
 
