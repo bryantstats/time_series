@@ -72,9 +72,25 @@ plot(t1, main = paste0("Medical Component of the CPI"))
 ```
 :::
 
+
 We observe that the series is not stationary because the mean does change over time.
 
 Notice that 
+
+- We can download the dataset to our computer and read the file from the computer using 
+
+
+::: {.cell}
+
+```{.r .cell-code}
+# make sure that the dataset is in the same folder as the Rmarkdown file when knitting or at the current working directory
+
+d <- read.csv('MedCPISmooth.csv')
+```
+:::
+
+
+Please also make sure that the dataset is in the same folder as the Rmarkdown file if the codes in an Rmarkdown or at the current working directory if the codes is excuted in the console. 
 
 - The dataset has multiple columns, but we only use the column `PerMEDCPI` as our time series.  
 
@@ -106,3 +122,5 @@ We can see that the ACF does not die out to zeroes (going out of the strip). Thi
 3. Use the `acf` function to plot the ACF of the time series in the above question. Base on the plot of the series and the ACF, do you think the series is stationary?
 
 4. Import a time series data of your own. Plot the series and the auto-correlation function of the series.  Does your time series have a trend or seasonal component? Is your series stationary?
+
+Notice that: If you do not have the direct link to the dataset file, you should download the file to your computer and save the file at the same folder as the Rmarkdown file. 
