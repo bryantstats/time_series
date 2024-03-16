@@ -1,5 +1,5 @@
 ---
-title: "AYU - Individual Week 1"
+title: "AYU - Week 1"
 format: 
   html:
     toc: true
