@@ -389,6 +389,14 @@ class: inverse, center, middle
 
 -   If `\(y_t\)` is stationary then `\(Var(y_t) = Constant\)`
 
+
+
+---
+# Series with Trend/Seasonality
+
+- Series with trend or seasonality are not stationary
+
+
 ---
 # Example
 
@@ -399,15 +407,24 @@ class: inverse, center, middle
 
 &lt;img src="note1_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
 
+- Time series with trend (hence the mean is not a constant) is not stationary. 
+
+
 ---
 # Example
 
+
 &lt;img src="note1_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+- This is a plot of a Random Walk series. The series is not stationary because the expected value (the mean) is changing over time, i.e. the series has trend. 
 
 ---
 # Example
 
 &lt;img src="note1_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+- Time series with seasonality is not stationary. 
+
 
 ---
 # Example
@@ -417,23 +434,16 @@ class: inverse, center, middle
 ---
 # Example
 
-- A Stationary series where both the mean and variance stay constant. 
-
 &lt;img src="note1_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
 # Example
 
-- This is a plot of a Random Walk series. The series is not stationary because the expected value (the mean) is changing over time. 
-
-
 &lt;img src="note1_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
 
----
-# Series with Trend
+- A Stationary series where both the mean and variance stay constant. 
 
-- Series with trend or seasonality are not stationary
 
 ---
 # Stationarity Analysis
@@ -457,7 +467,7 @@ We can inverstigate the stationarity of a time series using the following tools.
 
 &lt;img src="note1_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
 ---
-# ACF stationary series
+# ACF of stationary series
 
 - ACF of stationary usually quickly goes to zeros. Going zeroes here means the values is within the blue strip.  
 
@@ -466,17 +476,17 @@ We can inverstigate the stationarity of a time series using the following tools.
 &lt;img src="note1_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
-# ACF stationary series
+# ACF of trend series
 
 - ACF of time series with trend (hence, not stationary) usually decreases slowly. 
 
-- For example: below is the ACF of a linear trend (hence, not stationary) series
+- For example: below is the ACF of a linear trend (hence, not stationary) series. We observe that the ACF does not die out to zero (does not converge into the blue strip).
 
 &lt;img src="note1_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
 ---
-# ACF stationary series
+# ACF of seasonal series
 
-- Below is the ACF of a time series with seasonality (hence, not stationary). 
+- Below is the ACF of a time series with seasonality (hence, not stationary). We observe that the ACF does not die out to zero (does not converge into the blue strip).
 
 &lt;img src="note1_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
 

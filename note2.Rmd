@@ -100,7 +100,7 @@ output:
 ```{r setup, include = FALSE}
 
 # R markdown options
-knitr::opts_chunk$set(echo = FALSE, 
+knitr::opts_chunk$set(echo = TRUE, 
                       fig.width = 10,
                       fig.height = 5,
                       fig.align = "center", 
@@ -115,7 +115,8 @@ library(forecast)
 
 # Smoothing
 
--   Smoothing is usually done to reveal the series patterns and trends.
+-   Smoothing is usually done to remove the noise and reveal the series patterns and trends.
+-   We will study two smoothing techniques:  Moving Average Smoothing and Exponential Smoothing
 
 ---
 # Simple Moving Average Smoothing
@@ -142,7 +143,7 @@ d <- read_csv('data/MedCPISmooth.csv')
 t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
 k = 8
 t1_sma = SMA(t1, n = k)
-plot(t1, main = paste0("Medical Component of the CPI"))
+plot(t1, main = "Medical Component of the CPI")
 ```
 
 ---
@@ -153,7 +154,7 @@ d <- read_csv('data/MedCPISmooth.csv')
 t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
 k = 4
 t1_sma = SMA(t1, n = k)
-plot(t1, main = paste0("Moving average with k = ",k))
+plot(t1, main = paste0("Moving average with k = ", k))
 lines(t1_sma, col = "red")
 ```
 
@@ -239,6 +240,21 @@ t1_sma = SMA(t1, n = k)
 plot(t1, main = paste0("Moving average with k = ",k))
 lines(t1_sma, col = "red")
 ```
+
+---
+# Problem 1
+
+Given the following time series $y_t$. 
+
+| t | $y_t$ |
+|:---|:-------|
+| 1 | 1     |
+| 2 | 3     |
+| 3 | 5     |
+| 4 | 8     |
+| 5 | 12    |
+
+Calculate the moving average series with  $k = 2$
 
 ---
 # Forecasting
@@ -341,9 +357,14 @@ k = 12
 s1 = SMA(y, n = k)
 s2 = SMA(s1, n = k)
 
-
 b1_hat = 2*(s1[n]-s2[n])/(k-1)
+```
 
+
+---
+# Example
+
+```{r}
 autoplot(ts(y)) + ggtitle("Original Series")
 ```
 
@@ -373,8 +394,6 @@ $$\hat{y}_{100+l} = \hat{s}_{100}+ b_1\cdot l = \hat{s}_{100}+ 2.92\cdot l$$
 class: inverse, center, middle
 
 # Exponential Smoothing
-
-
 
 ---
 # MA Weights Distribution
@@ -536,6 +555,9 @@ t1 = read_csv("data/beer.csv")
 t1 = ts(t1, start = c(1956, 1), freq = 4)
 ```
 
+---
+# Example
+
 ```{r}
 ## Data 1
 # In exponential smoothing, a higher ratio will weight more on the recent observation, 
@@ -573,6 +595,22 @@ lines(t1_ema, col = "red")
 ```
 
 ---
+# Problem
+
+Given the following time series $y_t$.
+
+| t   | $y_t$ |
+|:----|:------|
+| 1   | 1     |
+| 2   | 3     |
+| 3   | 5     |
+| 4   | 8     |
+| 5   | 12    |
+
+Calculate the exponential smoothing series with $w = .2$
+
+
+---
 # Double Exponential Smoothing
 
 We can use double smoothing to identify the trend and forecast linear trend time series as follows.
@@ -604,10 +642,8 @@ class: middle, inverse, center
 
 # Time Series Decomposition
 
-
 ---
 # Two decompositions
-
 
 -   Additive Decomposition
 
@@ -633,9 +669,10 @@ $$
 
 [Link](https://tjeld.uia.no/shiny/valeriz/centered-vs-right/#:~:text=The%20turning%20point%20in%20a,the%20greater%20the%20lag%20time).
 
+---
 # Classical Decomposition
 
--   Trend Estimate: Smooth the data using centred moving average (CMA) of the order equal to the periodicity of the data
+-   Trend Estimate: Smooth the data using centered moving average (CMA) of the order equal to the periodicity of the data
 
 -   Detrend the data: calculate the detrended series by subtracting/dividing the trend estimate
 

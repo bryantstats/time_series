@@ -423,6 +423,14 @@ class: inverse, center, middle
 
 -   If $y_t$ is stationary then $Var(y_t) = Constant$
 
+
+
+---
+# Series with Trend/Seasonality
+
+- Series with trend or seasonality are not stationary
+
+
 ---
 # Example
 
@@ -448,6 +456,38 @@ y = 2*t+3+e
 library(ggfortify)
 autoplot(y) + ggtitle("Non-stationary due to non-constant expected value")
 ```
+
+- Time series with trend (hence the mean is not a constant) is not stationary. 
+
+
+---
+# Example
+
+
+```{r}
+set.seed(10)
+y <- arima.sim(list(order=c(0,1,0)), n=1000)
+library(ggfortify)
+autoplot(y) + ggtitle("A Non-Stationary Time Series")
+```
+
+- This is a plot of a Random Walk series. The series is not stationary because the expected value (the mean) is changing over time, i.e. the series has trend. 
+
+---
+# Example
+
+```{r}
+set.seed(30)
+n = 200
+e <- ts(rnorm(n, sd = .1))
+t = cos(.2*c(1:n))
+y = t+e
+library(ggfortify)
+autoplot(y) + ggtitle("Non-stationary due to seasonality")
+```
+
+- Time series with seasonality is not stationary. 
+
 
 ---
 # Example
@@ -477,20 +517,9 @@ library(ggfortify)
 autoplot(y) + ggtitle("Non-stationary due to non-constant variance")
 ```
 
----
-# Example
-
-```{r}
-set.seed(10)
-y <- ts(rnorm(200))
-library(ggfortify)
-autoplot(y) + ggtitle("")
-```
 
 ---
 # Example
-
-- A Stationary series where both the mean and variance stay constant. 
 
 ```{r}
 set.seed(10)
@@ -499,24 +528,8 @@ library(ggfortify)
 autoplot(y) + ggtitle("A Stationary Time Series")
 ```
 
+- A Stationary series where both the mean and variance stay constant. 
 
----
-# Example
-
-- This is a plot of a Random Walk series. The series is not stationary because the expected value (the mean) is changing over time. 
-
-
-```{r}
-set.seed(10)
-y <- arima.sim(list(order=c(0,1,0)), n=1000)
-library(ggfortify)
-autoplot(y) + ggtitle("A Non-Stationary Time Series")
-```
-
----
-# Series with Trend
-
-- Series with trend or seasonality are not stationary
 
 ---
 # Stationarity Analysis
@@ -544,7 +557,7 @@ y = ts(rnorm(100))
 acf(y)
 ```
 ---
-# ACF stationary series
+# ACF of stationary series
 
 - ACF of stationary usually quickly goes to zeros. Going zeroes here means the values is within the blue strip.  
 
@@ -557,11 +570,11 @@ acf(y)
 ```
 
 ---
-# ACF stationary series
+# ACF of trend series
 
 - ACF of time series with trend (hence, not stationary) usually decreases slowly. 
 
-- For example: below is the ACF of a linear trend (hence, not stationary) series
+- For example: below is the ACF of a linear trend (hence, not stationary) series. We observe that the ACF does not die out to zero (does not converge into the blue strip).
 
 ```{r}
 set.seed(2024)
@@ -569,9 +582,9 @@ y = ts(c(100:1)+ rnorm(100))
 acf(y)
 ```
 ---
-# ACF stationary series
+# ACF of seasonal series
 
-- Below is the ACF of a time series with seasonality (hence, not stationary). 
+- Below is the ACF of a time series with seasonality (hence, not stationary). We observe that the ACF does not die out to zero (does not converge into the blue strip).
 
 ```{r}
 set.seed(2024)
