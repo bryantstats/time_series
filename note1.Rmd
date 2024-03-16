@@ -528,7 +528,7 @@ library(ggfortify)
 autoplot(y) + ggtitle("A Stationary Time Series")
 ```
 
-- A Stationary series where both the mean and variance stay constant. 
+- This is a stationary series where both the mean and variance stay constant. 
 
 
 ---
