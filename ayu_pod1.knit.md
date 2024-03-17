@@ -117,7 +117,7 @@ We can see that the ACF does not die out to zeroes (going out of the strip). Thi
 
 1. Rerun all the given codes to reproduce the results. 
 
-2. Import and plot the series from [yearly medical expense.](data/yearly_MedCPI.csv)
+2. Import and plot the series from [yearly medical expense.](data/yearly_medCPI.csv)
 
 3. Use the `acf` function to plot the ACF of the time series in the above question. Base on the plot of the series and the ACF, do you think the series is stationary?
 
