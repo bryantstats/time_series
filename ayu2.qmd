@@ -97,6 +97,7 @@ B. Not smooth the data more strongly
 (Simple) Exponential Smoothing can be used to model 
 
 A. Series with no trend
+
 B. Series with linear trend
 
 ## Question 9
@@ -104,6 +105,7 @@ B. Series with linear trend
 Double Exponential Smoothing can be used to model 
 
 A. Series with no trend
+
 B. Series with linear trend
 
 ## Question 10
@@ -111,6 +113,7 @@ B. Series with linear trend
 Simple Moving Average Smoothing can be used to model 
 
 A. Series with no trend
+
 B. Series with linear trend
 
 ## Question 11
@@ -118,4 +121,7 @@ B. Series with linear trend
 Double Moving Average Smoothing can be used to model  
 
 A. Series with no trend
+
 B. Series with linear trend
+
+---
