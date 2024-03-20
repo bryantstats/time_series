@@ -20,11 +20,11 @@ editor: visual
 
 ------------------------------------------------------------------------
 
-## Question 1
+## Moving Average
 
 Use the following code to plot a time series and a moving average series. 
 
-```{r, eval=FALSE}
+```{r}
 
 install.packages('TTR') # install TTR package
 
@@ -74,7 +74,7 @@ In this question, we will use R to plot a time series, create an MA series and p
 ```{r, eval=FALSE}
 library(TTR)
 # read data
-d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
+d <- read.csv('data/MedCPISmooth.csv')
 
 # frequency = 4 for quarterly data, 
 # frequency = 12 for monthly data, 
@@ -84,6 +84,7 @@ t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
 
 # plot the time series
 plot(t1)
+ses(t1, )
 ```
 
 -   Use the below codes to add an exponential smoothing series
@@ -92,7 +93,6 @@ plot(t1)
 # In exponential smoothing, a higher ratio will weight more on the recent observation, 
 # ratio close to 1 will have a 100% weight on the most recent observation
 w = .1
-
 t1_ema = EMA(t1, ratio = 1-w)
 
 plot(t1)

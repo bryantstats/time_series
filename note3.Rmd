@@ -112,6 +112,136 @@ library(tidyverse)
 library(forecast)
 ```
 
+
+---
+class: middle, inverse, center
+
+# Time Series Decomposition
+
+---
+# Two decompositions
+
+-   Additive Decomposition
+
+$$
+y_t = S_t + T_t + R_t
+$$
+
+-   Multiplicative decomposition
+
+$$
+y_t = S_t\times T_t \times R_t
+$$
+
+- We can use smoothing to decompose a time series
+
+---
+# Relationship
+
+-   The log transformation will turn a multiplicative model to additive model.
+
+---
+# Central MA vs. MA
+
+[Link](https://tjeld.uia.no/shiny/valeriz/centered-vs-right/#:~:text=The%20turning%20point%20in%20a,the%20greater%20the%20lag%20time).
+
+---
+# Classical Decomposition
+
+-   Trend Estimate: Smooth the data using centered moving average (CMA) of the order equal to the periodicity of the data
+
+-   Detrend the data: calculate the detrended series by subtracting/dividing the trend estimate
+
+-   Seasonal Estimate: Average value for each period is calculated based on the de-trended series.
+
+-   Random/Remainder: subtract from the series the trend and seasonal component estimations
+
+---
+# Example
+
+```{r}
+data("AirPassengers")
+plot(AirPassengers)
+```
+
+---
+# Example
+
+```{r}
+ourDecomposition <- decompose(AirPassengers, type="additive")
+plot(ourDecomposition)
+```
+
+---
+# Example
+
+```{r}
+ourDecomposition <- decompose(AirPassengers, type="multiplicative")
+plot(ourDecomposition)
+```
+
+---
+# Example
+
+```{r, echo=TRUE}
+y <- ts(c(1:100) + 
+          50*cos(seq(0,16*pi,length.out=100)) + 
+          rnorm(100,0,10),frequency=12)
+```
+
+---
+# Example
+
+```{r}
+y <- ts(c(1:100) + 50*cos(seq(0,16*pi,length.out=100)) + rnorm(100,0,10),frequency=12)
+ourDecomposition <- decompose(y, type="additive")
+plot(ourDecomposition)
+```
+
+---
+# STL Decomposition
+
+-   Classical Decomposition uses Central Moving Average to estimate the trend
+
+-   STL uses LOESS (locally estimated scatterplot smoothing) to estimate the trend
+
+-   [Link](https://www.wessa.net/download/stl.pdf)
+
+-   The seasonal component is estimated using moving averages of the de-trend series
+
+---
+# STL Decomposition
+
+-   STL is a versatile and robust method for decomposing time series
+
+-   STL can be implemented using `stl` function
+
+---
+# STL Decomposition
+
+```{r, eval=FALSE, echo=TRUE}
+data("AirPassengers")
+stl_Decomposition <- stl(AirPassengers, 
+                        s.window = "periodic")
+plot(stl_Decomposition)
+```
+
+---
+# STL Decomposition
+
+```{r, echo=FALSE}
+data("AirPassengers")
+ourDecomposition <- stl(AirPassengers, s.window = "periodic")
+plot(ourDecomposition)
+```
+
+---
+# Other Decomposition Methods
+
+-   X-11 decomposition: originated in the US Census Bureau and Statistics Canada
+
+-   SEATS decomposition: developed at the Bank of Spain, and is now widely used by government agencies around the world
+
 ---
 class: inverse, middle, center
 
