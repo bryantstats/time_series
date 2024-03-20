@@ -758,10 +758,9 @@ es = function(y, w)
 ---
 # Foreacsting with ES
 
-- Just like MA, we have a concept of double ES
+- Just like MA, ES can be used to model series with no trend.
 
-- And we can use ES to estimate a linear trend time series
-
+- And we can use double ES to estimate a linear trend time series
 
 ---
 # Double Exponential Smoothing

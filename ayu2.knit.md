@@ -63,3 +63,58 @@ b.  Calculate the double exponential smoothing series with $w = .2$
 *Forecasting Linear Trend Time Series*
 
 We assume the series in question 1 has linear trend. Use double exponential smoothing to estimate the linear trend (slope) of the time series. Use the estimated linear trend to predict the next value ($y_8$)
+
+## Question 5 
+
+Given a series $y_t$.  Which smoothing methods use all the values $y_t$ to create a smoothing series?
+
+A. Exponential Smoothing
+B. Moving Average
+C. Both Exponential Smoothing and Moving Average
+D. Neither Exponential Smoothing nor Moving Average
+
+
+## Question 6
+
+In Moving Average, increase the smoothing parameter $k$ will
+
+A. Smooth the data more strongly
+
+B. Not smooth the data more strongly
+
+## Question 7
+
+In exponential smoothing, increase the smoothing parameter $w$ will
+
+A. Smooth the data more strongly
+
+B. Not smooth the data more strongly
+
+## Question 8
+
+(Simple) Exponential Smoothing can be used to model 
+
+A. Series with no trend
+B. Series with linear trend
+
+## Question 9
+
+Double Exponential Smoothing can be used to model 
+
+A. Series with no trend
+B. Series with linear trend
+
+## Question 10
+
+Simple Moving Average Smoothing can be used to model 
+
+A. Series with no trend
+B. Series with linear trend
+
+## Question 11
+
+Double Moving Average Smoothing can be used to model  
+
+A. Series with no trend
+B. Series with linear trend
+
