@@ -109,9 +109,8 @@ window.Quarto = {
    
   <ul>
   <li><a href="#instruction" id="toc-instruction" class="nav-link active" data-scroll-target="#instruction">Instruction</a></li>
-  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question 1</a></li>
-  <li><a href="#question-2" id="toc-question-2" class="nav-link" data-scroll-target="#question-2">Question 2</a></li>
-  <li><a href="#question-3" id="toc-question-3" class="nav-link" data-scroll-target="#question-3">Question 3</a></li>
+  <li><a href="#sample-codes" id="toc-sample-codes" class="nav-link" data-scroll-target="#sample-codes">1. Sample Codes</a></li>
+  <li><a href="#question" id="toc-question" class="nav-link" data-scroll-target="#question">2. Question</a></li>
   </ul>
 </nav>
 </div>
@@ -144,78 +143,117 @@ window.Quarto = {
 <li><p><em>Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -&gt; Knit to pdf) to convert the Rmarkdown file into a pdf file.</em></p></li>
 <li><p><em>Submit the pdf/Word to Canvas.</em></p></li>
 </ol>
-<p><a href="https://bryant.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1801b84d-b4c8-4116-9e5d-b133005fe750">Video Instruction</a>.</p>
+<p><a href="https://bryant.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1801b84d-b4c8-4116-9e5d-b133005fe750">Video Instruction</a>. (The same as the video in the first assignment)</p>
 <hr>
+<p>In this assignment we will learn how to implement the two smoothing techniques (moving average and exponential smoothing) on a time series to reveal its trend and pattern.</p>
 </section>
-<section id="question-1" class="level2">
-<h2 class="anchored" data-anchor-id="question-1">Question 1</h2>
-<p>Use the following code to plot a time series and a moving average series.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">'TTR'</span>) <span class="co"># install TTR package</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TTR)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># read data</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/math475/data/MedCPISmooth.csv'</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">=</span> <span class="fu">ts</span>(d<span class="sc">$</span>PerMEDCPI, <span class="at">start =</span> <span class="dv">1947</span>, <span class="at">frequency =</span> <span class="dv">4</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the time series</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t1)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># create a moving average series</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>k <span class="ot">=</span> <span class="dv">16</span>  <span class="co"># set the moving average </span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>t1_sma <span class="ot">=</span> <span class="fu">SMA</span>(t1, <span class="at">n =</span> k)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the moving average series</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t1_sma, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="question-2" class="level2">
-<h2 class="anchored" data-anchor-id="question-2">Question 2</h2>
-<p><em>Trend Revealing by Visualization</em></p>
-<p>In this question, we will use R to plot a time series, create an MA series and plot the MA series.</p>
+<section id="sample-codes" class="level2">
+<h2 class="anchored" data-anchor-id="sample-codes">1. Sample Codes</h2>
 <ul>
-<li>Open Rstudio and use the following code to plot a time series.</li>
+<li>This below codes illustrate how to create and then plot a moving average series from a given time series. We will use package <code>TTR</code>. To install the package (if you do not have the package installed already) by typing <code>install.packages('TTR')</code> into the console.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TTR)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># read data</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/math475/data/MedCPISmooth.csv'</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># frequency = 4 for quarterly data, </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># frequency = 12 for monthly data, </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># frequency = 1 for yearly data, by default frequency = 1</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>t1 <span class="ot">=</span> <span class="fu">ts</span>(d<span class="sc">$</span>PerMEDCPI, <span class="at">start =</span> <span class="dv">1947</span>, <span class="at">frequency =</span> <span class="dv">4</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the time series</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(TTR)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># read data</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'https://bryantstats.github.io/time_series/data/MedCPISmooth.csv'</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">ts</span>(d<span class="sc">$</span>PerMEDCPI, <span class="at">start =</span> <span class="dv">1947</span>, <span class="at">frequency =</span> <span class="dv">4</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the time series</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(y)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># create a moving average series</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>k <span class="ot">=</span> <span class="dv">16</span>  <span class="co"># set the moving average </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>y_sma <span class="ot">=</span> <span class="fu">SMA</span>(y, <span class="at">n =</span> k)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the moving average series</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(y_sma, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ayu_pod2_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <ul>
-<li>Use the below codes to add an exponential smoothing series</li>
+<li>This below codes illustrate how to create and then plot a exponential smoothing series from a given time series.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In exponential smoothing, a higher ratio will weight more on the recent observation, </span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ratio close to 1 will have a 100% weight on the most recent observation</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> .<span class="dv">1</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>t1_ema <span class="ot">=</span> <span class="fu">EMA</span>(t1, <span class="at">ratio =</span> <span class="dv">1</span><span class="sc">-</span>w)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(t1)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t1_ema, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In exponential smoothing, a higher ratio will weight more on the recent observation, </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ratio close to 1 will have a 100% weight on the most recent observation</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> .<span class="dv">9</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>y_ema <span class="ot">=</span> <span class="fu">EMA</span>(y, <span class="at">ratio =</span> <span class="dv">1</span><span class="sc">-</span>w)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(y)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(y_ema, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ayu_pod2_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 <ul>
-<li>Increase the value of <span class="math inline">\(w\)</span> to see the effect this parameter on the smoothing series. You can copy and paste the given codes and change the value of <span class="math inline">\(w\)</span>.</li>
+<li>This below codes illustrate how to plot forecasting using simple exponential smoothing series from a given time series. Notice that simple exponential smoothing is used to estimate series with no trend. And the foreasting of simple Es is a constant.</li>
 </ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> .<span class="dv">2</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>es_forecast1 <span class="ot">&lt;-</span> <span class="fu">ses</span>(y, <span class="at">alpha =</span> <span class="dv">1</span><span class="sc">-</span>w)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(es_forecast1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ayu_pod2_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><p>Notice that the two shadow areas around the forecast line are the confidence regions (of 80% and 95%) of the forecast.</p></li>
+<li><p>This below codes illustrate how to plot forecasting using double exponential smoothing series from a given time series. Notice that double exponential smoothing is used to estimate series with linear trend. And the foreasting of double Es is a line. This method is also called a Holt’s method.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>w <span class="ot">=</span> .<span class="dv">2</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>es_forecast2 <span class="ot">&lt;-</span> <span class="fu">holt</span>(y, <span class="at">alpha =</span> <span class="dv">1</span><span class="sc">-</span>w)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(es_forecast2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ayu_pod2_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="question-3" class="level2">
-<h2 class="anchored" data-anchor-id="question-3">Question 3</h2>
-<p><em>Trend Revealing by Visualization</em></p>
-<p>In this assignment we will study the dataset about the economy of Algeria. The dataset can be download at <a href="data/algeria_economy.csv">this link</a>.</p>
-<p>Use the sample codes in Question 3 to do the follows. Ask the instructor for any help.</p>
+<section id="question" class="level2">
+<h2 class="anchored" data-anchor-id="question">2. Question</h2>
+<ol type="1">
+<li><p>Reproduce the results of the above codes.</p></li>
+<li><p>In this question, we will study the dataset about the yearly economy of Algeria. The dataset can be download at <a href="data/algeria_economy.csv">this link</a>. Do the follows.</p></li>
+</ol>
 <ul>
 <li><p>Plot the time series of Algeria’s Exports</p></li>
-<li><p>Plot an exponential smoothing series for the above time series. What is your choice for <span class="math inline">\(w\)</span>?</p></li>
+<li><p>Plot a moving average smoothing series for the above time series. Change the values of <span class="math inline">\(k\)</span> to see the smoothing effect. What is your choice for <span class="math inline">\(k\)</span>?</p></li>
+<li><p>Plot an exponential smoothing series for the above time series. Change the values of <span class="math inline">\(w\)</span> to see the smoothing effect. What is your choice for <span class="math inline">\(w\)</span>?</p></li>
 </ul>
+<ol start="3" type="1">
+<li>Continue with the data from 2.</li>
+</ol>
+<ul>
+<li><p>Plot a forecast from exponential smoothing</p></li>
+<li><p>Plot a forecast from double exponential smoothing</p></li>
+</ul>
+<ol start="4" type="1">
+<li>Redo Question 2 and 3 with a time series of your choice.</li>
+</ol>
 <hr>
 </section>
 
