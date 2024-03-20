@@ -34,7 +34,7 @@ d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
 t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
 
 # plot the time series
-plot(t1, main = paste0("Medical Component of the CPI"))
+plot(t1)
 
 # create a moving average series
 k = 16  # set the moving average 
@@ -52,7 +52,7 @@ d <- read.csv('https://bryantstats.github.io/math475/data/yearly_MedCPI.csv')
 t1 = ts(d$yearly_MEDCPI, start = 1947, frequency = 1)
 
 # plot the time series
-plot(t1, main = paste0("Medical Component of the CPI"))
+plot(t1)
 
 # create a moving average series
 k = 4  # set the moving average 
@@ -83,7 +83,7 @@ d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
 t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
 
 # plot the time series
-plot(t1, main = paste0("Medical Component of the CPI"))
+plot(t1)
 ```
 
 -   Use the below codes to add an exponential smoothing series
@@ -95,7 +95,7 @@ w = .1
 
 t1_ema = EMA(t1, ratio = 1-w)
 
-plot(t1,  main = paste0("Exponential Smoothing with w = ", w))
+plot(t1)
 lines(t1_ema, col = "red")
 ```
 
@@ -105,9 +105,7 @@ lines(t1_ema, col = "red")
 
 *Trend Revealing by Visualization*
 
-In this assignment we will study the dataset about the economy of Algeria. The dataset can be download at [this link](data/algeria_economy.csv).
-
-Use the sample codes in Question 3 to do the follows. Ask the instructor for any help.
+In this assignment we will study the dataset about the yearly economy of Algeria. The dataset can be download at [this link](data/algeria_economy.csv).  Do the follows. 
 
 -   Plot the time series of Algeria's Exports
 
