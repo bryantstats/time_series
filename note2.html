@@ -4,7 +4,7 @@
     <title>Smoothing Techniques</title>
     <meta charset="utf-8" />
     <meta name="author" content=" Son Nguyen " />
-    <script src="libs/header-attrs-2.22/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.23/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
@@ -350,6 +350,18 @@ Thus,
     s^{(2)}_4 &amp;= \frac{6.5+4}{2} = 5.25\\
     s^{(2)}_3 &amp;= \frac{4+2}{2} = 3
 \end{align*}`
+
+---
+# Problem 2 - Solution
+
+| t | `\(y_t\)` | `\(s^{(1)}_t\)` | `\(s^{(2)}_t\)` |
+|:---|:-------|:-------|:-------|
+| 1 | 1     ||
+| 2 | 3     |2||
+| 3 | 5     |4|3|
+| 4 | 8     |6.5|5.25|
+| 5 | 12    |10|8.25|
+
 
 ---
 # Forecasting with Double MA
@@ -812,6 +824,18 @@ Calculate the exponential smoothing series with `\(w = .2\)`
     s_4 &amp;= (1-w)y_4 + ws_{3} = .8*8+.2*4.52 = 7.304\\
     s_5 &amp;= (1-w)y_5 + ws_{4} = .8*12+.2*7.304 = 11.0608
 \end{align*}`
+
+---
+# Problem 4 - Solution
+
+| t   | `\(y_t\)` | `\(s_t^{1}\)` | 
+|:----|:------|:------|
+| 1   | 1     |1   |
+| 2   | 3     |2.6 |
+| 3   | 5     |4.52|
+| 4   | 8     |7.304|
+| 5   | 12    |11.0608|
+
 
 ---
 # Foreacsting with ES
