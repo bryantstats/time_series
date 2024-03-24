@@ -30,7 +30,7 @@ variables X, Y, Z:
 
 ii) The following plot of the corresponding regression tree:
 
-![](\images\11.png)
+![](images\11.png)
 
 Calculate the Mean Response (MR) for each of the end nodes.
 
@@ -45,7 +45,7 @@ Calculate the Mean Response (MR) for each of the end nodes.
 You are given the following regression tree predicting the weight of ducks in
 kilograms (kg):
 
-![](\images\9.png)
+![](images\9.png)
 
 You predict the weight of the following three ducks:
 
@@ -132,9 +132,9 @@ III. Decision trees are easier to explain than linear regression methods.
 The following tree was constructed using recursive binary splitting with the left
 branch indicating that the inequality is true.
 
-![](\images\7.png)
+![](images\7.png)
 
 Determine which of the following plots represents this tree. 
 
-![](\images\8.png)
+![](images\8.png)
 ------------------------------------------------------------------------
