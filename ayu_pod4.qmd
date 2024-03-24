@@ -8,7 +8,7 @@ editor: visual
 
 ### Instruction
 
-1.  *Download the Rmarkdown file at [this link](ayu_pod_submission.Rmd)*
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
 
 2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
 
@@ -17,7 +17,6 @@ editor: visual
 4.  *Submit the pdf/Word to Canvas.*
 
 ------------------------------------------------------------------------
-
 
 ![](images/13.png)
 
@@ -67,5 +66,4 @@ Let $y_t$ be the personal consumption expenditure series. Assume that the differ
 
 -   Plot the fitted $y_t$ and $y_t$ on the same graph.
 
-
----
+------------------------------------------------------------------------

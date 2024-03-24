@@ -8,15 +8,13 @@ editor: visual
 
 ### Instruction
 
-1.  *Download the Rmarkdown file at [this link](ayu_pod_submission.Rmd)*
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
 
 2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
 
 3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
 
 4.  *Submit the pdf/Word to Canvas.*
-
-[Video Instruction](https://drive.google.com/file/d/1-iswKjJpGn_fF3XOtyI__taRhEGX4OMw/view). 
 
 ------------------------------------------------------------------------
 
