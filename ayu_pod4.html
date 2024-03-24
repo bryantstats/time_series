@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>AYU - Individual Week 4</title>
+<title>R - Assignment 4</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,17 +23,19 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="ayu4_files/libs/clipboard/clipboard.min.js"></script>
-<script src="ayu4_files/libs/quarto-html/quarto.js"></script>
-<script src="ayu4_files/libs/quarto-html/popper.min.js"></script>
-<script src="ayu4_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="ayu4_files/libs/quarto-html/anchor.min.js"></script>
-<link href="ayu4_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="ayu4_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="ayu4_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="ayu4_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="ayu4_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="ayu_pod4_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ayu_pod4_files/libs/quarto-html/quarto.js"></script>
+<script src="ayu_pod4_files/libs/quarto-html/popper.min.js"></script>
+<script src="ayu_pod4_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ayu_pod4_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ayu_pod4_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ayu_pod4_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ayu_pod4_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ayu_pod4_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ayu_pod4_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -45,13 +47,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#problem-1" id="toc-problem-1" class="nav-link active" data-scroll-target="#problem-1">Problem 1</a></li>
-  <li><a href="#problem-2" id="toc-problem-2" class="nav-link" data-scroll-target="#problem-2">Problem 2</a></li>
-  <li><a href="#problem-3" id="toc-problem-3" class="nav-link" data-scroll-target="#problem-3">Problem 3</a></li>
-  <li><a href="#problem-4" id="toc-problem-4" class="nav-link" data-scroll-target="#problem-4">Problem 4</a></li>
-  <li><a href="#problem-5" id="toc-problem-5" class="nav-link" data-scroll-target="#problem-5">Problem 5</a></li>
-  <li><a href="#problem-6" id="toc-problem-6" class="nav-link" data-scroll-target="#problem-6">Problem 6</a></li>
-  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><img src="\images\8.png" class="img-fluid"></a></li>
+  <li><a href="#instruction" id="toc-instruction" class="nav-link active" data-scroll-target="#instruction">Instruction</a></li>
+  <li><a href="#question-1." id="toc-question-1." class="nav-link" data-scroll-target="#question-1.">Question 1.</a></li>
+  <li><a href="#question-2." id="toc-question-2." class="nav-link" data-scroll-target="#question-2.">Question 2.</a></li>
   </ul>
 </nav>
 </div>
@@ -59,7 +57,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">AYU - Individual Week 4</h1>
+<h1 class="title">R - Assignment 4</h1>
 </div>
 
 
@@ -74,170 +72,52 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<section id="instruction" class="level3">
+<h3 class="anchored" data-anchor-id="instruction">Instruction</h3>
+<ol type="1">
+<li><p><em>Download the Rmarkdown file at <a href="ayu_pod_submission.Rmd">this link</a></em></p></li>
+<li><p><em>Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.</em></p></li>
+<li><p><em>Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -&gt; Knit to pdf) to convert the Rmarkdown file into a pdf file.</em></p></li>
+<li><p><em>Submit the pdf/Word to Canvas.</em></p></li>
+</ol>
 <hr>
-<p><strong>Instruction</strong>: <em>Scan your answer into pdf/word document then submit to Canvas.</em></p>
-<section id="problem-1" class="level2">
-<h2 class="anchored" data-anchor-id="problem-1">Problem 1</h2>
-<p>You are given:</p>
-<ol type="i">
-<li>The following observed values of the response variable, R, and predictor variables X, Y, Z:</li>
-</ol>
-<table class="table">
-<colgroup>
-<col style="width: 5%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-<col style="width: 10%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">R</th>
-<th style="text-align: left;">4.75</th>
-<th style="text-align: left;">4.67</th>
-<th style="text-align: left;">4.67</th>
-<th style="text-align: left;">4.56</th>
-<th style="text-align: left;">4.53</th>
-<th style="text-align: left;">3.91</th>
-<th style="text-align: left;">3.90</th>
-<th style="text-align: left;">3.90</th>
-<th style="text-align: left;">3.89</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">X</td>
-<td style="text-align: left;">M</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: left;">M</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: left;">M</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: left;">F</td>
-<td style="text-align: left;">M</td>
-<td style="text-align: left;">M</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Y</td>
-<td style="text-align: left;">A</td>
-<td style="text-align: left;">A</td>
-<td style="text-align: left;">D</td>
-<td style="text-align: left;">D</td>
-<td style="text-align: left;">B</td>
-<td style="text-align: left;">C</td>
-<td style="text-align: left;">B</td>
-<td style="text-align: left;">D</td>
-<td style="text-align: left;">B</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Z</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">4</td>
-<td style="text-align: left;">1</td>
-<td style="text-align: left;">3</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">2</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: left;">5</td>
-<td style="text-align: left;">1</td>
-</tr>
-</tbody>
-</table>
-<ol start="2" type="i">
-<li>The following plot of the corresponding regression tree:</li>
-</ol>
-<p><img src="\images\11.png" class="img-fluid"></p>
-<p>Calculate the Mean Response (MR) for each of the end nodes.</p>
-<ol type="A">
-<li>MR(T1) = 4.39, MR(T2) = 4.38, MR(T3) = 4.29, MR(T4) = 3.90</li>
-<li>MR(T1) = 4.26, MR(T2) = 4.38, MR(T3) = 4.62, MR(T4) = 3.90</li>
-<li>MR(T1) = 4.26, MR(T2) = 4.39, MR(T3) = 3.90, MR(T4) = 4.29</li>
-<li>MR(T1) = 4.64, MR(T2) = 4.29, MR(T3) = 4.38, MR(T4) = 3.90</li>
-<li>MR(T1) = 4.64, MR(T2) = 4.38, MR(T3) = 4.39, MR(T4) = 3.90</li>
-</ol>
+<p><img src="images/13.png" class="img-fluid"></p>
 </section>
-<section id="problem-2" class="level2">
-<h2 class="anchored" data-anchor-id="problem-2">Problem 2</h2>
-<p>You are given the following regression tree predicting the weight of ducks in kilograms (kg):</p>
-<p><img src="\images\9.png" class="img-fluid"></p>
-<p>You predict the weight of the following three ducks:</p>
-<p>X: Wing Span = 5.5 cm, Male, Age = 7 years</p>
-<p>Y: Wing Span = 5.8 cm, Female, Age = 5 years</p>
-<p>Z: Wing Span = 5.7 cm, Male, Age = 8 years</p>
-<p>Determine the order of the predicted weights of the three ducks.</p>
-<ol type="A">
-<li>X &lt; Y &lt; Z</li>
-<li>X &lt; Z &lt; Y</li>
-<li>Y &lt; X &lt; Z</li>
-<li>Y &lt; Z &lt; X</li>
-<li>Z &lt; X &lt; Y</li>
-</ol>
-</section>
-<section id="problem-3" class="level2">
-<h2 class="anchored" data-anchor-id="problem-3">Problem 3</h2>
-<p>A classification tree is being constructed to predict if an insurance policy will lapse. A random sample of 100 policies contains 30 that lapsed. You are considering two splits:</p>
+<section id="question-1." class="level3">
+<h3 class="anchored" data-anchor-id="question-1.">Question 1.</h3>
+<p>Working with the <a href="data/inflation.csv">inflation data</a>. The dataset contains monthly observations in the US from 1950-2 to 1990-12. A time series containing :</p>
 <ul>
-<li>Split 1: One node has 20 observations with 12 lapses and one node has 80 observations with 18 lapses.</li>
-<li>Split 2: One node has 10 observations with 8 lapses and one node has 90 observations with 22 lapses.</li>
+<li><p>pai1: one-month inflation rate (in percent, annual rate)</p></li>
+<li><p>pai3: three-month inflation rate (in percent, annual rate)</p></li>
+<li><p>tb1: one-month T-bill rate (in percent, annual rate)</p></li>
+<li><p>tb3: three-month T-bill rate (in percent, annual rate)</p></li>
+<li><p>cpi: CPI for urban consumers, all items (the 1982-1984 average is set to 100)</p></li>
 </ul>
-<p>The total Gini index after a split is the weighted average of the Gini index at each node, with the weights proportional to the number of observations in each node.</p>
-<p>The total entropy after a split is the weighted average of the entropy at each node, with the weights proportional to the number of observations in each node.</p>
-<p>Determine which of the following statements is/are true?</p>
+<p><strong>Do the follows.</strong></p>
 <ul>
-<li><p>(I). Split 1 is preferred based on the total Gini index.</p></li>
-<li><p>(II). Split 1 is preferred based on the total entropy.</p></li>
-<li><p>(III). Split 1 is preferred based on having fewer classification errors.</p></li>
+<li><p>Create a time series of three-month inflation rate</p></li>
+<li><p>Plot the series and the ACF to check if the series is stationary</p></li>
+<li><p>Create the differenced series and check for stationary</p></li>
+<li><p>Fit the MA(1) model to the series and plot the fitted series</p></li>
+<li><p>Make prediction on the next value of three-month inflation rate</p></li>
+<li><p>Fit the AR(1) model to the series and plot the fitted series</p></li>
+<li><p>Make prediction on the next value of three-month inflation rate</p></li>
 </ul>
-<ol type="A">
-<li>I only</li>
-<li>II only</li>
-<li>III only</li>
-<li>I, II, and III</li>
-<li>The correct answer is not given by (A), (B), (C), or (D)</li>
-</ol>
 </section>
-<section id="problem-4" class="level2">
-<h2 class="anchored" data-anchor-id="problem-4">Problem 4</h2>
-<p>Each picture below represents a two-dimensional space where observations are classified into two categories. The categories are representing by light and dark shading. A classification tree is to be constructed for each space.</p>
-<p><img src="\images\5.png" class="img-fluid"></p>
-<p>Determine which space can be modeled with no error by a classification tree.</p>
-<ol type="A">
-<li>I only</li>
-<li>II only</li>
-<li>III only</li>
-<li>I, II, and III</li>
-<li>The correct answer is not given by (A), (B), (C), or (D).</li>
-</ol>
-</section>
-<section id="problem-5" class="level2">
-<h2 class="anchored" data-anchor-id="problem-5">Problem 5</h2>
-<p>Determine which of the following considerations may make decision trees preferable to other statistical learning methods.</p>
-<p>I. Decision trees are easily interpretable.</p>
-<ol start="2" type="I">
-<li><p>Decision trees can be displayed graphically.</p></li>
-<li><p>Decision trees are easier to explain than linear regression methods.</p></li>
-</ol>
-<ol type="A">
-<li>None</li>
-<li>I and II only</li>
-<li>I and III only</li>
-<li>II and III only</li>
-<li>The correct answer is not given by (A), (B), (C), or (D).</li>
-</ol>
-</section>
-<section id="problem-6" class="level2">
-<h2 class="anchored" data-anchor-id="problem-6">Problem 6</h2>
-<p>The following tree was constructed using recursive binary splitting with the left branch indicating that the inequality is true.</p>
-<p><img src="\images\7.png" class="img-fluid"></p>
-<p>Determine which of the following plots represents this tree.</p>
-</section>
-<section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section"><img src="\images\8.png" class="img-fluid"></h2>
+<section id="question-2." class="level3">
+<h3 class="anchored" data-anchor-id="question-2.">Question 2.</h3>
+<p>Consider the <a href="data/consumption.csv">Consumption data</a>. This is a quarterly data on consumption and expenditure in Canada. The series started from Quarter 1 in 1947.</p>
+<p>The time series containing :</p>
+<ul>
+<li><p>yd: personal disposable income, 1986 dollars</p></li>
+<li><p>ce: personal consumption expenditure, 1986 dollars</p></li>
+</ul>
+<p>Let <span class="math inline">\(y_t\)</span> be the personal consumption expenditure series. Assume that the differenced series of <span class="math inline">\(y_t\)</span> is stationary.</p>
+<ul>
+<li><p>Use the MA(1) model to fit the differenced series and make a prediction on the next value of <span class="math inline">\(y_t\)</span> .</p></li>
+<li><p>Plot the fitted <span class="math inline">\(y_t\)</span> and <span class="math inline">\(y_t\)</span> on the same graph.</p></li>
+</ul>
+<hr>
 </section>
 
 </main>

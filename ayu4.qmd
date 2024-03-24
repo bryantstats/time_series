@@ -15,80 +15,126 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = FAL
 
 **Instruction**: *Scan your answer into pdf/word document then submit to Canvas.*
 
-## Question 1. 
+## Problem 1
 
-*Calculation*
+You are given:
 
-Given the following time series $y_t$.
+i) The following observed values of the response variable, R, and predictor
+variables X, Y, Z:
 
-| t   | $y_t$ |
-|:----|:------|
-| 1   | 1     |
-| 2   | 3     |
-| 3   | 5     |
-| 4   | 8     |
-| 5   | 12    |
-| 6   | 13    |
-| 7   | 16    |
+| R | 4.75 | 4.67 | 4.67 | 4.56 | 4.53 | 3.91 | 3.90 | 3.90 | 3.89 |
+|:---|:------|:------|:------|:------|:------|:------|:------|:------|:------|
+| X | M    | F    | M    | F    | M    | F    | F    | M    | M    |
+| Y | A    | A    | D    | D    | B    | C    | B    | D    | B    |
+| Z | 2    | 4    | 1    | 3    | 2    | 2    | 5    | 5    | 1    |
 
-a.  Calculate the moving average series with $k = 2$
+ii) The following plot of the corresponding regression tree:
 
-b.  Calculate the moving average series with $k = 3$
+![](\images\11.png)
 
-c.  Calculate the double moving average series with $k = 3$
+Calculate the Mean Response (MR) for each of the end nodes.
 
-## Question 2.
+(A) MR(T1) = 4.39, MR(T2) = 4.38, MR(T3) = 4.29, MR(T4) = 3.90
+(B) MR(T1) = 4.26, MR(T2) = 4.38, MR(T3) = 4.62, MR(T4) = 3.90
+(C) MR(T1) = 4.26, MR(T2) = 4.39, MR(T3) = 3.90, MR(T4) = 4.29
+(D) MR(T1) = 4.64, MR(T2) = 4.29, MR(T3) = 4.38, MR(T4) = 3.90
+(E) MR(T1) = 4.64, MR(T2) = 4.38, MR(T3) = 4.39, MR(T4) = 3.90
 
-*Application of MA: Forecasting Linear Trend Time Series*
+## Problem 2
 
-We assume the series in question 1 has linear trend. Use double smoothing average to estimate the linear trend (slope) of the time series. Use the estimated linear trend to predict the next value ($y_8$)
+You are given the following regression tree predicting the weight of ducks in
+kilograms (kg):
 
-## Question 3.
+![](\images\9.png)
 
-Application of MA: Trend Revealing by Visualization*
+You predict the weight of the following three ducks:
 
-In this question, we will use R to plot a time series, create an MA series and plot the MA series.
+X: Wing Span = 5.5 cm, Male, Age = 7 years
 
--   Download and Install R at: [link](https://cran.r-project.org/bin/windows/base/R-4.3.2-win.exe)
+Y: Wing Span = 5.8 cm, Female, Age = 5 years
 
--   Download and Install Rstudio at: [link](https://download1.rstudio.org/electron/windows/RStudio-2023.12.0-369.exe)
+Z: Wing Span = 5.7 cm, Male, Age = 8 years
 
--   Open Rstudio and use the following code to plot a time series and a moving average series.
+Determine the order of the predicted weights of the three ducks.
 
-```{r, eval=FALSE}
-install.packages('TTR') # install TTR package
-library(TTR)
-# read data
-d <- read.csv('https://bryantstats.github.io/math475/data/MedCPISmooth.csv')
-t1 = ts(d$PerMEDCPI, start = 1947, frequency = 4)
+(A) X < Y < Z
+(B) X < Z < Y
+(C) Y < X < Z
+(D) Y < Z < X
+(E) Z < X < Y
 
-# plot the time series
-plot(t1, main = paste0("Medical Component of the CPI"))
 
-# create a moving average series
-k = 16  # set the moving average 
-t1_sma = SMA(t1, n = k)
+## Problem 3
 
-# plot the moving average series
-lines(t1_sma, col = "red")
-```
+A classification tree is being constructed to predict if an insurance policy will
+lapse. A random sample of 100 policies contains 30 that lapsed. You are
+considering two splits:
 
-```{r, eval=FALSE, echo=FALSE}
-library(TTR)
-# read data
-d <- read.csv('https://bryantstats.github.io/math475/data/yearly_MedCPI.csv')
+- Split 1: One node has 20 observations with 12 lapses and one node has 80
+observations with 18 lapses.
+- Split 2: One node has 10 observations with 8 lapses and one node has 90
+observations with 22 lapses.
 
-t1 = ts(d$yearly_MEDCPI, start = 1947, frequency = 1)
+The total Gini index after a split is the weighted average of the Gini index at each node,
+with the weights proportional to the number of observations in each node.
 
-# plot the time series
-plot(t1, main = paste0("Medical Component of the CPI"))
+The total entropy after a split is the weighted average of the entropy at each node, with
+the weights proportional to the number of observations in each node.
 
-# create a moving average series
-k = 4  # set the moving average 
-t1_sma = SMA(t1, n = k)
+Determine which of the following statements is/are true?
 
-# plot the moving average series
-lines(t1_sma, col = "red")
-```
+- (I). Split 1 is preferred based on the total Gini index.
 
+- (II). Split 1 is preferred based on the total entropy.
+
+- (III). Split 1 is preferred based on having fewer classification errors.
+
+(A) I only
+(B) II only
+(C) III only
+(D) I, II, and III
+(E) The correct answer is not given by (A), (B), (C), or (D)
+
+## Problem 4
+
+Each picture below represents a two-dimensional space where observations are
+classified into two categories. The categories are representing by light and dark
+shading. A classification tree is to be constructed for each space.
+
+![](\images\5.png)
+
+Determine which space can be modeled with no error by a classification tree.
+
+(A) I only
+(B) II only
+(C) III only
+(D) I, II, and III
+(E) The correct answer is not given by (A), (B), (C), or (D).
+
+## Problem 5
+
+Determine which of the following considerations may make decision trees
+preferable to other statistical learning methods.
+
+I. Decision trees are easily interpretable.
+
+II. Decision trees can be displayed graphically.
+
+III. Decision trees are easier to explain than linear regression methods.
+
+(A) None
+(B) I and II only
+(C) I and III only
+(D) II and III only
+(E) The correct answer is not given by (A), (B), (C), or (D).
+
+## Problem 6
+The following tree was constructed using recursive binary splitting with the left
+branch indicating that the inequality is true.
+
+![](\images\7.png)
+
+Determine which of the following plots represents this tree. 
+
+![](\images\8.png)
 ------------------------------------------------------------------------
