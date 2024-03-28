@@ -113,6 +113,175 @@ library(forecast)
 ```
 
 
+# Smoothing vs. Modeling
+
+- Smoothing a time series reveals its pattern and trend
+
+- 
+
+
+---
+# Forecasting with ES
+
+- Single ES: constant level (no trend) and no seasonality
+
+- Holt’s Exponential Smoothing (Using double ES): has trend and no seasonality. 
+
+- Holt-Winters Exponential Smoothing (Using triple ES): has trend and seasonality. 
+
+---
+class: inverse, center, middle
+
+# Forecasting with Single Exponential Smoothing
+
+- constant level (no trend) and no seasonality
+
+---
+# Forecasting with Single ES
+
+```{r, eval=FALSE}
+library(forecast)
+rain <- read.csv('data/rainfall_london.csv')
+ts1 <- ts(rain,start=c(1813))
+plot(ts1)
+```
+
+
+
+
+---
+# Forecasting with Single ES
+
+```{r, echo=FALSE}
+library(forecast)
+rain <- read.csv('data/rainfall_london.csv')
+ts1 <- ts(rain,start=c(1813))
+plot(ts1)
+```
+
+
+---
+# Making Forecast
+
+```{r}
+ts1_forecast <- HoltWinters(ts1, alpha=TRUE, 
+                            beta=FALSE, 
+                            gamma=FALSE)
+ts1_forecast
+```
+
+---
+# Making Forecast
+
+```{r}
+plot(ts1_forecast)
+```
+
+---
+### Forecasting
+
+```{r}
+ts1_forecast2 <- forecast(ts1_forecast, h=8)
+ts1_forecast2
+```
+
+---
+```{r}
+plot(ts1_forecast2)
+```
+
+
+---
+class: center, middle, inverse
+
+# Holt’s Exponential Smoothing
+
+---
+**Holt’s Exponential Smoothing**
+
+```{r}
+skirts <- read.csv('data/skirts.csv')
+ts2 <- ts(skirts,start=c(1866))
+plot(ts2)
+```
+
+---
+
+```{r}
+ts2_forecast <- HoltWinters(ts2, alpha=TRUE, 
+                            beta=TRUE, 
+                            gamma=FALSE)
+ts2_forecast
+```
+
+---
+
+```{r}
+plot(ts2_forecast)
+```
+
+---
+
+```{r}
+ts2_forecast2 <- forecast(ts2_forecast, h=19)
+plot(ts2_forecast2)
+```
+
+---
+class: center, inverse, middle
+
+# Holt-Winters Exponential Smoothing
+
+---
+```{r}
+souvenir <- read.csv('data/souvenir.csv')
+ts3 <- ts(souvenir, frequency=12, start=c(1987,1))
+plot(ts3)
+```
+
+
+---
+```{r}
+ts3_forecasts <- HoltWinters(ts3, alpha=TRUE, 
+                            beta=TRUE, 
+                            gamma=TRUE)
+plot(ts3_forecasts)
+```
+
+
+---
+```{r}
+ts3_forecasts2 <- forecast(ts3_forecasts, h=48)
+plot(ts3_forecasts2)
+```
+
+
+---
+
+```{r, eval=FALSE}
+souvenir <- read.csv('data/souvenir.csv')
+ts3 <- ts(souvenir, frequency=12, start=c(1987,1))
+logts3 <- log(ts3)
+ts3_forecasts <- HoltWinters(logts3)
+plot(ts3_forecasts)
+ts3_forecasts2 <- forecast(ts3_forecasts, h=48)
+plot(ts3_forecasts2)
+```
+
+
+---
+
+- The parameters alpha, beta and gamma all have values between 0 and 1.
+
+- Values that are close to 0 mean that relatively little weight is placed on the most recent observations (the weights are spread out for the past observations) when making forecasts of future values.
+
+- Alpha estimates the level
+
+- Beta estimate the slopes of the trend component
+
+- Gamma estimate the slope of the seasonal component
+
+
 ---
 class: middle, inverse, center
 
@@ -441,163 +610,3 @@ plot(ourDecomposition)
 
 -   SEATS decomposition: developed at the Bank of Spain, and is now widely used by government agencies around the world
 
----
-# Forecasting with ES
-
-- Single ES: constant level (no trend) and no seasonality
-
-- Holt’s Exponential Smoothing (Using double ES): has trend and no seasonality. 
-
-- Holt-Winters Exponential Smoothing (Using triple ES): has trend and seasonality. 
-
----
-class: inverse, center, middle
-
-# Forecasting with Single Exponential Smoothing
-
-- constant level (no trend) and no seasonality
-
----
-# Forecasting with Single ES
-
-```{r, eval=FALSE}
-library(forecast)
-rain <- read.csv('data/rainfall_london.csv')
-ts1 <- ts(rain,start=c(1813))
-plot(ts1)
-```
-
-
-
-
----
-# Forecasting with Single ES
-
-```{r, echo=FALSE}
-library(forecast)
-rain <- read.csv('data/rainfall_london.csv')
-ts1 <- ts(rain,start=c(1813))
-plot(ts1)
-```
-
-
----
-# Making Forecast
-
-```{r}
-ts1_forecast <- HoltWinters(ts1, alpha=TRUE, 
-                            beta=FALSE, 
-                            gamma=FALSE)
-ts1_forecast
-```
-
----
-# Making Forecast
-
-```{r}
-plot(ts1_forecast)
-```
-
----
-### Forecasting
-
-```{r}
-ts1_forecast2 <- forecast(ts1_forecast, h=8)
-ts1_forecast2
-```
-
----
-```{r}
-plot(ts1_forecast2)
-```
-
-
----
-class: center, middle, inverse
-
-# Holt’s Exponential Smoothing
-
----
-**Holt’s Exponential Smoothing**
-
-```{r}
-skirts <- read.csv('data/skirts.csv')
-ts2 <- ts(skirts,start=c(1866))
-plot(ts2)
-```
-
----
-
-```{r}
-ts2_forecast <- HoltWinters(ts2, alpha=TRUE, 
-                            beta=TRUE, 
-                            gamma=FALSE)
-ts2_forecast
-```
-
----
-
-```{r}
-plot(ts2_forecast)
-```
-
----
-
-```{r}
-ts2_forecast2 <- forecast(ts2_forecast, h=19)
-plot(ts2_forecast2)
-```
-
----
-class: center, inverse, middle
-
-# Holt-Winters Exponential Smoothing
-
----
-```{r}
-souvenir <- read.csv('data/souvenir.csv')
-ts3 <- ts(souvenir, frequency=12, start=c(1987,1))
-plot(ts3)
-```
-
-
----
-```{r}
-ts3_forecasts <- HoltWinters(ts3, alpha=TRUE, 
-                            beta=TRUE, 
-                            gamma=TRUE)
-plot(ts3_forecasts)
-```
-
-
----
-```{r}
-ts3_forecasts2 <- forecast(ts3_forecasts, h=48)
-plot(ts3_forecasts2)
-```
-
-
----
-
-```{r, eval=FALSE}
-souvenir <- read.csv('data/souvenir.csv')
-ts3 <- ts(souvenir, frequency=12, start=c(1987,1))
-logts3 <- log(ts3)
-ts3_forecasts <- HoltWinters(logts3)
-plot(ts3_forecasts)
-ts3_forecasts2 <- forecast(ts3_forecasts, h=48)
-plot(ts3_forecasts2)
-```
-
-
----
-
-- The parameters alpha, beta and gamma all have values between 0 and 1.
-
-- Values that are close to 0 mean that relatively little weight is placed on the most recent observations (the weights are spread out for the past observations) when making forecasts of future values.
-
-- Alpha estimates the level
-
-- Beta estimate the slopes of the trend component
-
-- Gamma estimate the slope of the seasonal component

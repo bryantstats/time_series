@@ -32,7 +32,7 @@ Given the following time series.
 | 7   | 16    |
 | 8   | 20    |
 | 9   | 25    |
-| 10   | 30    |
+| 10   | 30   |
 
 a. Use simple exponential smoothing to forecast the values of $y_{11}$
 
