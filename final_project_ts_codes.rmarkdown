@@ -1,0 +1,490 @@
+---
+title: "Final Project"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = TRUE)
+```
+
+
+------------------------------------------------------------------------
+
+This is sample codes for the time series project.  The codes work on the series of monthly Amtrak
+ridership between January 1991 and March 2004 in the United States.  The dataset can be download at the link below. 
+
+[Data](Amtrak_data.csv)
+
+------------------------------------------------------------------------
+
+## Data Preparation for Time Series Models
+
+
+```{r}
+library(TTR)
+library(forecast)
+library(xts)
+library(tidyverse)
+library(caret)
+library(lubridate)
+
+# read the data into df
+df = read.csv("Amtrak_data.csv")
+df = na.omit(df)
+n = nrow(df)
+
+# Select the series
+series_values = df$Ridership
+
+# Create the series. This series start from January 1991 and end in March 2004
+y = ts(series_values, start = c(1991,1), freq = 12)
+
+# data partition
+train_percentage = 0.8
+train_size = floor(train_percentage * n)
+test_size = n - train_size
+
+train_data_ts = window(y, start = c(1991, 1), end = c(1991, train_size))
+test_data_ts = window(y, start = c(1991, train_size + 1), end = c(1991, n))
+```
+
+
+### Data Preparation for ML Models
+
+
+```{r}
+# Create lag features for time series data
+lags = 1:48  # Number of lags to consider
+
+time_index = seq(as.Date("1991-01-01"), length=n, by="months")
+ts_xts = xts(series_values, order.by = time_index)
+
+lagged_data = stats::lag(ts_xts, k = lags)  # Create lagged data
+ 
+# Combine the lagged features into one data frame
+lagged_df = as_tibble(data.frame(lagged_data))
+colnames(lagged_df) = paste0("lag", lags)  # Rename columns with lag prefixes
+
+# Merge the lagged features with the original data
+data_ml = data.frame(time_index, series_values,  lagged_df)
+
+# Split the data into training and testing sets
+train_data_ml = data_ml[1:train_size, ]
+train_data_ml = na.omit(train_data_ml)
+test_data_ml = data_ml[(train_size + 1):n, ]
+```
+
+
+
+## 1. Basic Time Series Models
+
+
+```{r}
+# average method: forecast by the average of the training series
+model_name = "Average Model"
+model = meanf(train_data_ts, h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+# naive: forecast by the last observation of the series
+
+model_name = "Naive Model"
+model = naive(train_data_ts, h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+# seasonal naive: forecast by the last season
+
+model_name = "Seasonal Naive Model"
+model = snaive(train_data_ts, h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+# drift: drawing the line from the first to the last observation
+model_name = "Drift Model"
+model = rwf(train_data_ts, h = test_size, drift = TRUE)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+
+
+## 2. Time Series Models
+
+### 2.1. Exponential Models 
+
+
+```{r}
+model_name = "Simple Exponential Smoothing"
+model = ses(train_data_ts, h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "Holt"
+model = holt(train_data_ts, damped = TRUE, h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "Multiplicative Seasonal Holt-Winters with Damped"
+model = hw(train_data_ts, seasonal="multiplicative", damped = TRUE,  h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "Additive Seasonal Holt-Winters with Damped"
+model = hw(train_data_ts, seasonal="additive", damped = TRUE,  h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+
+
+## 2.2 Regression Models
+
+
+```{r}
+model_name = "Regression with time trend"
+model = tslm(train_data_ts ~ trend, damped = TRUE, h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "Regression with time trend and season"
+model = tslm(train_data_ts ~ trend + season, damped = TRUE, h = test_size)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+
+### 2.3 ARIMA Models 
+
+
+```{r}
+model_name = "Auto ARIMA"
+model = auto.arima(train_data_ts, seasonal = FALSE)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "Auto Seasonal ARIMA"
+model = auto.arima(train_data_ts, seasonal = TRUE)
+
+forecasting = forecast(model, h = test_size)
+acc = accuracy(forecasting$mean, test_data_ts)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = as.numeric(forecasting$mean), color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+
+## 3. Machine Learning Models
+
+
+```{r}
+model_name = "spikeslab"
+model = train(series_values~., data = train_data_ml[, -1], method = "spikeslab") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "gamLoess"
+model = train(series_values~., data = train_data_ml[, -1], method = "gamLoess") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "svmLinear"
+model = train(series_values~., data = train_data_ml[, -1], method = "svmLinear") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "gaussprLinear"
+model = train(series_values~., data = train_data_ml[, -1], method = "gaussprLinear") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "cubist"
+model = train(series_values~., data = train_data_ml[, -1], method = "cubist") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "enet"
+model = train(series_values~., data = train_data_ml[, -1], method = "enet") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "leapForward"
+model = train(series_values~., data = train_data_ml[, -1], method = "leapForward") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "leapBackward"
+model = train(series_values~., data = train_data_ml[, -1], method = "leapBackward") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "nnls"
+model = train(series_values~., data = train_data_ml[, -1], method = "nnls") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "gaussprLinear"
+model = train(series_values~., data = train_data_ml[, -1], method = "gaussprLinear") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "gaussprPoly"
+model = train(series_values~., data = train_data_ml[, -1], method = "gaussprPoly") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "gamSpline"
+model = train(series_values~., data = train_data_ml[, -1], method = "gamSpline") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "knn"
+model = train(series_values~., data = train_data_ml[, -1], method = "knn") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "kernelpls"
+model = train(series_values~., data = train_data_ml[, -1], method = "kernelpls") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+```{r}
+model_name = "rvmPoly"
+model = train(series_values~., data = train_data_ml[, -1], method = "rvmPoly") 
+predictions = predict(model, test_data_ml[, -1])
+
+acc = accuracy(as.numeric(predictions), test_data_ml$series_values)
+
+ggplot(data_ml) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data_ml, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title =paste("Model: ", model_name), y = "series_values",subtitle = paste0("MAPE = ", round(acc[5], 2)))
+```
+
+
+------------------------------------------------------------------------

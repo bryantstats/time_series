@@ -1,0 +1,121 @@
+---
+title: "AYU - Individual Week 3"
+format: 
+  html:
+    toc: true
+editor: visual
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, eval = TRUE)
+```
+
+------------------------------------------------------------------------
+
+**Instruction**: *Scan or put your answer into pdf/word document then submit to Canvas.*
+
+---
+
+Please refer to the class notes to do the following problems. 
+
+[Class Slides](note3.html)
+
+# Problem 1
+
+Simple Exponential Smoothing should be used to make forecast on series that 
+
+a. have no trend but have seasonality
+
+b. have trend but no seasonality
+
+c. have both trend and seasonality
+
+d. Have no trend and not seasonality
+
+# Problem 2
+
+What are the parameters of Simple Exponential Smoothing? How these parameters are estimated?
+
+# Problem 3
+
+Given the following time series $y_t$.     
+
+```{r, echo=FALSE}
+library(knitr)
+library(tidyverse)
+y = ts(c(3.5, 3, 2.7, 4, 3.8))
+kable(tibble(t = c(1:length(y)), y = y))
+```
+
+- Assume that the series does not have the trend and seasonality component. What is the parameters of simple exponential smoothing that best forecast the series? 
+
+- Make a forecast using the Simple Exponential Smoothing with these parameters to forecast the three next values of the series.
+
+- Comment on the impact of the value of $\alpha$ on the smoothed series. 
+
+# Problem 4
+
+Holt's method should be used to make forecast on series that 
+
+a. have no trend but have seasonality
+
+b. have trend but no seasonality
+
+c. have both trend and seasonality
+
+d. Have no trend and not seasonality
+
+
+# Problem 5
+
+Given the following time series $y_t$.     
+
+```{r, echo=FALSE}
+library(knitr)
+y = ts(c(12.5, 13, 14.7, 15, 17.8, 19, 20, 21, 25, 32.5))
+kable(tibble(t = c(1:length(y)), y = y))
+```
+
+- Assume that the series have the trend and no seasonality component. What is the parameters of Holt's method that best forecast the series? 
+
+- Make a forecast for the next value of the series
+
+# Problem 6
+
+What is the main difference between the Holt's method and the Damped Holt's method?
+
+# Problem 7
+
+Redo Problem 5 using the Damped Holt's method
+
+
+# Problem 8
+
+Holt-Winters' method should be used to make forecast on series that 
+
+a. have no trend but have seasonality
+
+b. have trend but no seasonality
+
+c. have both trend and seasonality
+
+d. Have no trend and not seasonality
+
+# Problem 9
+
+Given the following series with the frequency of 4 (Quarterly Data). 
+
+```{r, echo=FALSE}
+set.seed(2024)
+y = round(ts(c(1:20)+3*cos(3*c(1:20))+rnorm(20, sd = .5), frequency = 4),2)
+kable(tibble(t = c(1:length(y)), y = y))
+```
+
+- Assume that the series have the trend and seasonality component. Find the parameters of and make a forecast for the next value of the series using the following models
+
+a. Holt-Winters' additive method 
+
+b. Holt-Winters' additive method with Damping
+
+------------------------------------------------------------------------

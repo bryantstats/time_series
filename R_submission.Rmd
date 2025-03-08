@@ -1,0 +1,19 @@
+
+---
+title: "R-Assignment"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+## Question 2
+
+## Question 3
+
+## Question 4
+
+

@@ -1,0 +1,112 @@
+---
+title: "R - Assignment 2"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+### Instruction
+
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
+
+2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+4.  *Submit the pdf/Word to Canvas.*
+
+[Video Instruction](https://bryant.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=1801b84d-b4c8-4116-9e5d-b133005fe750). (The same as the video in the first assignment)
+
+------------------------------------------------------------------------
+
+In this assignment we will learn how to implement the two smoothing techniques (moving average and exponential smoothing) on a time series to reveal its trend and pattern.  
+
+## 1. Sample Codes
+
+- This below codes illustrate how to create and then plot a moving average series from a given time series. We will use package `TTR`. To install the package (if you do not have the package installed already) by typing `install.packages('TTR')` into the console. 
+
+```{r}
+library(TTR)
+# read data
+d <- read.csv('https://bryantstats.github.io/time_series/data/MedCPISmooth.csv')
+y = ts(d$PerMEDCPI, start = 1947, frequency = 4)
+
+# plot the time series
+plot(y)
+
+# create a moving average series
+k = 16  # set the moving average 
+y_sma = SMA(y, n = k)
+
+# plot the moving average series
+lines(y_sma, col = "red")
+```
+- This below codes illustrate how to create and then plot a exponential smoothing series from a given time series. 
+
+```{r}
+# In exponential smoothing, a higher ratio will weight more on the recent observation, 
+# ratio close to 1 will have a 100% weight on the most recent observation
+w = .9
+y_ema = EMA(y, ratio = 1-w)
+
+plot(y)
+lines(y_ema, col = "red")
+```
+
+- This below codes illustrate how to plot forecasting using simple exponential smoothing series from a given time series. Notice that simple exponential smoothing is used to estimate series with no trend. And the foreasting of simple Es is a constant. 
+
+
+```{r}
+library(forecast)
+w = .2
+es_forecast1 <- ses(y, alpha = 1-w)
+plot(es_forecast1)
+```
+
+- Notice that the two shadow areas around the forecast line are the confidence regions (of 80% and 95%) of the forecast. 
+
+- This below codes illustrate how to plot forecasting using double exponential smoothing series from a given time series. Notice that double exponential smoothing is used to estimate series with linear trend. And the foreasting of double Es is a line. This method is also called a Holt's method. 
+
+
+```{r}
+library(forecast)
+w = .2
+es_forecast2 <- holt(y, alpha = 1-w)
+plot(es_forecast2)
+```
+
+## 2. Question 
+
+1. Reproduce the results of the above codes.
+
+2. In this question, we will study the dataset about the yearly economy of Algeria. The dataset can be download at [this link](data/algeria_economy.csv).  Do the follows. 
+
+-   Plot the time series of Algeria's Exports
+
+-    Plot a moving average smoothing series for the above time series. Change the values of $k$ to see the smoothing effect. What is your choice for $k$?
+
+-   Plot an exponential smoothing series for the above time series. Change the values of $w$ to see the smoothing effect. What is your choice for $w$?
+
+3. Continue with the data from 2. 
+
+- Plot a forecast from exponential smoothing
+
+- Plot a forecast from double exponential smoothing
+
+```{r, eval=FALSE, echo=FALSE}
+
+d =  read.csv('data/algeria_economy.csv')
+t2 = ts(d$Exports, start = 1960, frequency = 1)
+w = .7
+
+t2_ema = EMA(t2, ratio = 1-w)
+
+plot(t2,  main = paste0("Exponential Smoothing with w = ", w))
+lines(t2_ema, col = "red")
+```
+
+4. Redo Question 2 and 3 with a time series of your choice. 
+
+
+---

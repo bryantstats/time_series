@@ -1,0 +1,60 @@
+---
+title: "R - Assignment 3"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+### Instruction
+
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
+
+2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+4.  *Submit the pdf/Word to Canvas.*
+
+------------------------------------------------------------------------
+
+Please refer to the class notes to do the following problems. 
+
+[Class Slides](note3.html)
+
+## Problem 1
+
+Given the following three time series. All of these series are monthly series (Thus, `frequency = 12`)
+
+[Series 1](data/series1.csv)
+
+```{r, eval=FALSE, echo=FALSE}
+library(forecast)
+y1 = round(ts(c(1:100)+10*cos(c(1:100))+rnorm(100, sd = 1), frequency = 12),2)
+write.csv(y1, 'series1.csv', row.names = FALSE)
+plot(hw(y1))
+```
+
+
+[Series 2](data/series2.csv)
+
+[Series 3](data/series3.csv)
+
+
+```{r, eval=FALSE, echo=FALSE}
+
+y = read.csv('data/series1.csv')
+y = ts(y, frequency = 12)
+plot(y)
+
+```
+
+
+Apply the appropriate exponential smoothing model for each series to make a forecast for the next value of the series. Explain your reason when choosing the model. Plot the forecast for each series. 
+
+## Problem 2
+
+Find a time series and apply an appropriate exponential smoothing model for the series to make a forecast for the next value of the series. Explain your reason when choosing the model. Plot the forecast. 
+
+
+---

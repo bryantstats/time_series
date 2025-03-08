@@ -1,0 +1,25 @@
+---
+title: "AYU - Individual Week 9"
+format: 
+  html:
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Notice**: *The AYU this week is the same as the R-Assignment. Submit your knitted document to Canvas.*
+
+
+## Question 
+
+1. Find a time series and convert the series into a tabular series with 6 lags . Implement at least 5 machine learning models on the tabular series. Plot the forecast series and the original series. Report the MAPE of the models. 
+
+2. Increase the number of lags and redo the avove. Does increasing the number of lags improve the models' performance?  
+
+
+------------------------------------------------------------------------

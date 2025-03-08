@@ -1,0 +1,857 @@
+
+---
+title: "Smoothing Techniques"
+author: <font size="5"> Son Nguyen </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{css, echo=FALSE}
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+```{r setup, include = FALSE}
+
+# R markdown options
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE,
+                      warning = FALSE)
+
+# Load packages
+library(tidyverse)
+library(forecast)
+```
+
+
+# Smoothing
+
+-   Smoothing is usually done to remove the noise and reveal the series patterns and trends.
+-   We will study two smoothing techniques:  Moving Average Smoothing and Exponential Smoothing
+
+---
+# Simple Moving Average Smoothing
+
+-   Moving Average (MA) creates a new series by averaging the most recent observations from the original series.
+
+-   Given the series $y_t$, MA(k) creates $s_t$ as follows.
+
+$$s_{t} = \frac{y_t + y_{t-1} +...+ y_{t-k+1}}{k}$$
+
+-   Larger $k$ will smooth the series more strongly
+
+---
+# Example
+
+```{r}
+library(ggfortify)
+library(tidyverse)
+library(xts)
+library(fpp2)
+library(TTR)
+
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 8
+t1_sma = SMA(t1, n = k)
+plot(t1, main = "Medical Component of the CPI")
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 4
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ", k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 8
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 16
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+d <- read_csv('data/MedCPISmooth.csv')
+t1 = ts(d$PerMEDCPI, start = c(1947, 1), frequency = 4)
+k = 32
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+t1 = read_csv("data/beer.csv")
+t1 = ts(t1, start = c(1956, 1), freq = 4)
+k = 1
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Original Series"))
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+t1 = read_csv("data/beer.csv")
+t1 = ts(t1, start = c(1956, 1), freq = 4)
+k = 2
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+k = 5
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+k = 12
+t1_sma = SMA(t1, n = k)
+plot(t1, main = paste0("Moving average with k = ",k))
+lines(t1_sma, col = "red")
+```
+
+---
+# Problem 1
+
+Given the following time series $y_t$. 
+
+| t | $y_t$ |
+|:---|:-------|
+| 1 | 1     |
+| 2 | 3     |
+| 3 | 5     |
+| 4 | 8     |
+| 5 | 12    |
+
+Calculate the moving average series with  $k = 2$
+
+---
+# Problem 1 - Solution
+
+Since $k=2$, we have $$s_t = \frac{y_t+y_{t-1}}{2}$$.  
+
+Thus,
+
+\begin{align*}
+    s_5 &= \frac{12+8}{2} = 10\\
+    s_4 &= \frac{8+5}{2} = 6.5\\
+    s_3 &= \frac{5+3}{2} = 4\\
+    s_2 &= \frac{3+1}{2} = 2
+\end{align*}
+
+---
+# Forecasting with MA
+
+-   We can use MA smoothing for forecasting a series with **no trend**. 
+-   Forecasting all the next values of $y_t$ by $s_t$
+-   If there is a linear trend in a series, we can use the double moving average to estimate the trend (slope)
+
+---
+class: inverse, center, middle
+
+# Double MA
+
+---
+# Double MA
+
+- Let $s^{(1)}_t$ be the moving average, MA(k), of $y_t$
+- The moving average of $s^{(1)}_t$ is called the double moving average of $y_t$.
+- The double MA can be denoted as $s^{(2)}_t$
+
+---
+# Problem 2
+
+Given the following time series $y_t$. 
+
+| t | $y_t$ |
+|:---|:-------|
+| 1 | 1     |
+| 2 | 3     |
+| 3 | 5     |
+| 4 | 8     |
+| 5 | 12    |
+
+Calculate the double moving average series with  $k = 2$
+
+---
+# Problem 2 - Solution
+
+In Problem 1, we already found $s^{(1)}_t$. 
+
+We have
+
+| t | $y_t$ | $s^{(1)}_t$ |
+|:---|:-------|:-------|
+| 1 | 1     |
+| 2 | 3     |2|
+| 3 | 5     |4|
+| 4 | 8     |6.5|
+| 5 | 12    |10|
+
+---
+# Problem 2 - Solution
+
+Now let's calculate the double MA from the single MA.  We have $$s^{(2)}_t = \frac{s^{(1)}_t+s^{(1)}_{t-1}}{2}$$
+Thus,
+
+\begin{align*}
+    s^{(2)}_5 &= \frac{10+6.5}{2} = 8.25\\
+    s^{(2)}_4 &= \frac{6.5+4}{2} = 5.25\\
+    s^{(2)}_3 &= \frac{4+2}{2} = 3
+\end{align*}
+
+---
+# Problem 2 - Solution
+
+| t | $y_t$ | $s^{(1)}_t$ | $s^{(2)}_t$ |
+|:---|:-------|:-------|:-------|
+| 1 | 1     ||
+| 2 | 3     |2||
+| 3 | 5     |4|3|
+| 4 | 8     |6.5|5.25|
+| 5 | 12    |10|8.25|
+
+
+---
+# Forecasting with Double MA
+
+- Double MA can be used to forecast series that has linear trend or
+
+$$y_t = \beta_0 + \beta_1t +\epsilon_t$$
+---
+# Forecasting with Double MA
+
+Let $y_t$ be a linear trend time series: $y_t = \beta_0 + \beta_1t +\epsilon_t$.  The procedure to use double MA to estimate $y_t$ is as follows. 
+
+-   Step 1: MA Smooth the series 
+
+$$s^{(1)}_{t} = \frac{y_t + y_{t-1} +...+ y_{t-k+1}}{k}$$
+
+-   Step 2: MA Smooth the smoothed series 
+
+$$s^{(2)}_{t} = \frac{s^{(1)}_t + s^{(1)}_{t-1} +...+ s^{(1)}_{t-k+1}}{k}$$
+
+-   Step 3: Calculate the linear trend/slope. Let the current time is $T$ 
+
+$$b_1 = \hat{\beta_1} =  \frac{2}{k-1}\bigg(s_T^{(1)}-s_T^{(2)}\bigg)$$
+
+---
+# Forecasting
+
+-   Forecasting $l$ lead time into future by $$
+    \hat{y}_{T+l} = s^{(1)}_T + b_1 \cdot l
+    $$
+
+---
+# Problem 3
+
+| t | $y_t$ |
+|:---|:-------|
+| 1 | 1     |
+| 2 | 3     |
+| 3 | 5     |
+| 4 | 8     |
+| 5 | 12    |
+
+We assume the series has linear trend. Use double smoothing average with $k=2$ to estimate the linear trend (slope) of the time series. Use the estimated linear trend to predict the next values $y_6$ and $y_7$
+
+
+---
+# Problem 3 - Solution
+
+This is the same series as in Problem 1 and Problem 2. Thus, we already calculated the MA and the double MA with $k=2$.  
+
+| t | $y_t$ | $s^{(1)}_t$ | $s^{(2)}_t$ |
+|:---|:-------|:-------|:-------|
+| 1 | 1     ||
+| 2 | 3     |2||
+| 3 | 5     |4|3|
+| 4 | 8     |6.5|5.25|
+| 5 | 12    |10|8.25|
+
+Also notice that $T=5$.  We have 
+
+\begin{align*}
+    b_1 = \hat{\beta_1} &=  \frac{2}{k-1}\bigg(s_T^{(1)}-s_T^{(2)}\bigg)\\
+        &= \frac{2}{2-1}\bigg(10-8.25\bigg)\\
+        &= 3.5
+\end{align*}
+
+---
+# Problem 3 - Solution
+
+Using the formula $$\hat{y}_{T+l} = s^{(1)}_T + b_1 \cdot l$$
+
+
+
+Thus, $$\hat{y}_6 = s^{(1)}_5 + b_1 \cdot 1 = 10 + 3.5*1 = 13.5$$ and $$\hat{y}_7 = s^{(1)}_5 + b_1 \cdot 2 = 10 + 3.5*2 = 17$$
+
+---
+# Example
+
+- To illustrate how good double MA methods for linear estimation, we will simulate a series from a linear model then use the double MA to estimate the linear equation generated the series.
+
+-   We simulate 100 data points ( $T=100$ ) of $$
+    y_t = 1 +3t + \epsilon, 
+    $$ where, $\epsilon \sim N(0, 5^2)$.
+    
+- We see that the slope is 3.  Let's estimate the slope from the data using double MA
+
+---
+# Example
+
+```{r}
+set.seed(2022)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 1
+b1 = 3
+
+e = rnorm(n, sd = 5)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*t+e[t]
+}
+
+k = 12 
+s1 = SMA(y, n = k)
+s2 = SMA(s1, n = k)
+
+b1_hat = 2*(s1[n]-s2[n])/(k-1)
+b1_hat
+```
+
+- We see that the estimated slope is `r b1_hat`, which is very close to its true value. 
+- Thus, the double MA is doing pretty well in this case. 
+
+---
+# Example
+
+- Let's plot the simulated series
+
+```{r}
+plot(ts(y))
+```
+
+---
+class: inverse, center, middle
+
+# Exponential Smoothing
+
+---
+# MA Weights Distribution
+
+- In MA(2), we have
+
+$$s_t = \frac{y_t + y_{t-1}}{2} = 50\% \cdot y_t +50\% \cdot y_{t-1}$$
+
+- This means that each $y_t$ and $y_{t-1}$ contribute equally to create $s_t$. 
+
+- Also, $s_t$ does not have any contribution from all the previous values: $y_{t-2}, y_{t-3}$ and so on. 
+
+- We say that $s_t$ is a combination from all 50% of $y_t$, 50% of $y_{t-1}$ and 0 from $y_{t-2}$, $y_{t-3}$, $y_{t-4}$, and so on. 
+
+---
+# MA Weights Distribution
+
+- Let plot the weight (contribution) of each $y_t$ on $s_t$ for a series that has 20 observations for MA(2). 
+
+```{r}
+k = 2
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+- For MA(3)
+
+```{r}
+k = 4
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 6
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 10
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# MA Weights Distribution
+
+```{r}
+k = 15
+t = 20
+
+weights = c(rep(0, t-k), rep(1/k,k))
+plot(weights, main = paste0("Weights for MA Smoothing with k = ", k))
+```
+
+---
+# Exponential Smoothing
+
+- We observe that $MA(k)$ ignore the first values of $y_t$ (i.e., $y_1, y_2...$) to when creating $s_t$
+
+- Exponential Smoothing will use all the values of $y_t$ (starting from $y_1, y_2...$) to create $s_t$
+
+
+---
+# Exponential Smoothing
+
+-   MA distributes the weight equally to the recent observations
+
+-   Exponential Smoothing controls the weights of the recent observations by $w$
+
+$$s_{t} = \frac{y_t + wy_{t-1} + w^2y_{t-2} + ... + w^ty_0}{1/(1-w)}$$
+
+-   Smaller $w$ smooths the series more lightly.
+
+-   Greater $w$ smooths the series more strongly.
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .1
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+- When $w$ is small, ES does not use much information from the first values of $y_t$
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .3
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+- When $w$ is small, ES does not use much information from the first values of $y_t$
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .5
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+- Increasing $w$, will increase the contribution of the first values and decrease the contribution of the latest values of $y_t$
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .7
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+- Increasing $w$, will increase the contribution of the first values and decrease the contribution of the latest values of $y_t$
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .9
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+- Increasing $w$, will increase the contribution of the first values and decrease the contribution of the latest values of $y_t$
+
+---
+# Exponential Weights Distribution
+
+```{r}
+w = .99
+t = 20
+
+weights = (1-w)*w^(c(t:0))
+plot(weights, main = paste0("Weights for Exponential Smoothing with w = ", w))
+```
+
+- Increasing $w$, will increase the contribution of the first values and decrease the contribution of the latest values of $y_t$
+
+---
+# Exponential Smoothing
+
+- ES can be expressed by two formulas
+
+- Formula 1
+
+$$s_{t} = \frac{y_t + wy_{t-1} + w^2y_{t-2} + ... + w^ty_0}{1/(1-w)}$$
+
+-   Formula 2
+
+\begin{align*}
+    s_1 &= y_1\\  
+    s_{t} & = s_{t-1} + (1-w)(y_t-s_{t-1})\\
+                & = (1-w)y_t + ws_{t-1}
+\end{align*}
+
+
+---
+# Example
+
+```{r}
+library(ggfortify)
+library(tidyverse)
+library(xts)
+library(fpp2)
+library(TTR)
+## Data 1
+t1 = read_csv("data/beer.csv")
+t1 = ts(t1, start = c(1956, 1), freq = 4)
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+# In exponential smoothing, a higher ratio will weight more on the recent observation, 
+# ratio close to 1 will have a 100% weight on the most recent observation
+alpha = .9
+t1_ema = EMA(t1, ratio = alpha)
+plot(t1,  main = paste0("Exponential Smoothing with w = ", 1- alpha))
+lines(t1_ema, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+# In exponential smoothing, a higher ratio will weight more on the recent observation, 
+# ratio close to 1 will have a 100% weight on the most recent observation
+alpha = .5
+t1_ema = EMA(t1, ratio = alpha)
+plot(t1,  main = paste0("Exponential Smoothing with w = ", 1- alpha))
+lines(t1_ema, col = "red")
+```
+
+---
+# Example
+
+```{r}
+## Data 1
+# In exponential smoothing, a higher ratio will weight more on the recent observation, 
+# ratio close to 1 will have a 100% weight on the most recent observation
+alpha = .1
+t1_ema = EMA(t1, ratio = alpha)
+plot(t1,  main = paste0("Exponential Smoothing with w = ", 1- alpha))
+lines(t1_ema, col = "red")
+```
+
+
+---
+# Problem 4
+
+Given the following time series $y_t$.
+
+| t   | $y_t$ |
+|:----|:------|
+| 1   | 1     |
+| 2   | 3     |
+| 3   | 5     |
+| 4   | 8     |
+| 5   | 12    |
+
+Calculate the exponential smoothing series with $w = .2$
+
+```{r, eval=FALSE, echo=FALSE}
+
+es = function(y, w)
+{
+  s = y
+  n = length(y)-1
+  for (i in c(1:n))
+  {
+    s[i+1] = (1-w)*y[i+1] + w*s[i]
+  }
+    
+  return(s)
+}
+```
+
+
+---
+# Problem 4 - Solution
+
+- We will use the following formula
+
+\begin{align*}
+    s_1 &= y_1\\  
+    s_{t} & = (1-w)y_t + ws_{t-1}
+\end{align*}
+
+- We have $s_1 = y_1 = 1$
+
+- Then 
+
+\begin{align*}
+    s_2 &= (1-w)y_2 + ws_{1} = .8*3+.2*1 = 2.6 \\
+    s_3 &= (1-w)y_3 + ws_{2} = .8*5+.2*2.6 = 4.52\\
+    s_4 &= (1-w)y_4 + ws_{3} = .8*8+.2*4.52 = 7.304\\
+    s_5 &= (1-w)y_5 + ws_{4} = .8*12+.2*7.304 = 11.0608
+\end{align*}
+
+---
+# Problem 4 - Solution
+
+| t   | $y_t$ | $s_t^{1}$ | 
+|:----|:------|:------|
+| 1   | 1     |1   |
+| 2   | 3     |2.6 |
+| 3   | 5     |4.52|
+| 4   | 8     |7.304|
+| 5   | 12    |11.0608|
+
+
+---
+# Foreacsting with ES
+
+- Just like MA, ES can be used to model series with no trend.
+
+- And we can use double ES to estimate a linear trend time series
+
+---
+# Double Exponential Smoothing
+
+Assume that the series following a linear model as
+
+$$y_t = \beta_0 + \beta_1t +\epsilon_t$$
+
+We can use double smoothing to identify the trend and forecast linear trend time series as follows.
+
+-   Step 1: Create a Exponential smoothed series: $s^{(1)}_{t} = (1-w)y_t + ws^{(1)}_{t-1}$
+
+-   Step 2: Create a double Exponential smoothed series: $s^{(2)}_{t} = (1-w)s^{(1)}_{t} + ws^{(2)}_{t-1}$
+
+-   Step 3: Estimate the trend: 
+$$b_1 = \frac{1-w}{w}(s^{(1)}_{T}-s^{(2)}_{T})$$
+
+-   Step 4: Forecast
+
+$$\hat{y}_{T+l} = s^{(1)}_{T} + b_1\cdot l$$
+
+---
+# Problem 5
+
+Given the following time series $y_t$.
+
+| t   | $y_t$ |
+|:----|:------|
+| 1   | 1     |
+| 2   | 3     |
+| 3   | 5     |
+| 4   | 8     |
+| 5   | 12    |
+
+-   Assume that this is a linear trend time series. Using double exponential smoothing with $w = .8$ to estimate the trend (slope) and forecast $y_{6}$ and $y_7$.
+
+---
+# Problem 5 - Solution
+
+This is the same series as in Problem 4. With similar calculation, we obtain the ES and double ES series as follows. 
+
+| t   | $y_t$ | $s_t^{1}$ | $s_t^{2}$ |
+|:----|:------|:------|:------|
+| 1   | 1     |1   |1|
+| 2   | 3     |2.6 |2.28|
+| 3   | 5     |4.52|4.072|
+| 4   | 8     |7.304|6.6576|
+| 5   | 12    |11.0608|10.18016|
+
+- We estimate the trend (slope) as follows. 
+
+\begin{align*}
+    b_1 & = \frac{1-w}{w}(s^{(1)}_{T}-s^{(2)}_{T}) \\
+    & = \frac{1-.2}{.2}(11.0608-10.18016)\\
+    & = 3.52256
+\end{align*}
+
+---
+# Problem 5 - Solution
+
+- Make forecasting using the formula. Notice that $T=5$
+
+$$\hat{y}_{T+l} = s^{(1)}_{T} + b_1\cdot l$$
+
+- We have
+
+$$\hat{y}_{6} = s^{(1)}_{T} + b_1\cdot 1 = 11.0608 + 3.52256*1 = 14.58336$$
+
+$$\hat{y}_{7} = s^{(1)}_{T} + b_1\cdot 2 = 11.0608 + 3.52256*2 = 18.10592$$
+

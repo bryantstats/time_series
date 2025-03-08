@@ -1,0 +1,150 @@
+
+---
+title: "Midterm Exam/Project"
+output:
+  word_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
+  pdf_document:
+    toc: yes
+---
+
+---
+
+## 1. Data Exploration
+
+-   Describe your time series and the source of the series.
+
+-   Import the series. *Note: Make sure you specify the correct starting time and frequency for the series.*
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+
+-   Plot the time series.
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+
+-   Comment on the trend of the series (does the series have trend? upward or downward? from when to when, etc).
+
+-   Comment on the seasonality of the series (does the series have seasonal component? if so, what is the seasonal period, etc.)
+
+-   Comment on the seasonality of the series. Notice that trend or seasonal series is not stationary, being stationary implying having constant variance and constant mean.
+
+### 1.1 Smoothing
+
+-   *Moving Average*: Explain the main idea of Moving average. Apply the MA method on the series. Plot the original series and its MA smoothing. Try a few different moving average $k$ and comment on the trend of the series through the smoothing curve. What values of $k$ best reveal the series pattern?
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+-   *Exponential Smoothing* (ES): Explain the main idea of exponential smoothing. Apply the ES method on the series. Plot the original series and its ES smoothing. Try a few different weights comment on the trend of the series through the smoothing curve. What values of the weight best reveal the series' pattern? Compare the ES curve and the MA curve above.
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+### 1.2 Auto-correltion
+
+-   Explain what the Auto-correlation Function (ACF) is and plot the ACF of the series. What is the first value of the ACF (ACF when the lag is 0) Is the series stationary according to the look of the ACF?
+
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+## 2. Modelling
+
+We will implement the following models to make a forecast for the series.
+
+-   The Mean/Average model: forecast by the average of the training series
+
+-   The Naive Model: forecast by the last observation of the series
+
+-   The Seasonal Naive Model: forecast by the values of the last season
+
+-   All the exponential smoothing models
+
+-   The regression model
+
+-   Random Walk with drift Model: Drawing the line from the first to the last observation
+
+To evaluate the models, We will use a machine learning approach, which is use a portion of the data for training and the remainder data for testing. We also perform residual analysis for the models.
+
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+### 2.1 Model Training
+
+Follow the sample codes to.
+
+-   Split the original series into the training series and the testing series
+
+-   Train all the models on the training series
+
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+### 2.2 Residual Analysis
+
+A `good` model would have residuals looks like white-noise of a mean zero normal distribution, which means
+
+-   The residuals should have no autocorrelation.
+-   The residuals should have a mean zero
+-   The residuals should have constant variance
+-   The residuals should be normally distributed
+
+Report the residuals analysis of all the models. Which model would you consider `good` models? Some indications of a `good` model could be
+
+-   The ACF is within the blue strip
+-   The distribution of the residual follows a bell curve
+-   The p-value of the Ljung-Box test is large
+
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+### 2.3 Testing Accuracy
+
+-   Calculate the forecast of all the models on the validation period. Calculate the Mean absolute percentage error (MAPE) of all the models. Plot the forecast of all models.
+
+-   Which model gives the lowest MAPE? Which model gives the greatest MAPE?
+
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+## 3. Forecasting
+
+Based on the MAPE above, decide the selected model. Retrain the best model on the entire series. Use the retrained model to forecast the next values. Plot the series and the forecast values.
+
+
+```{r}
+# insert your codes here to address the questions
+
+```
+
+------------------------------------------------------------------------

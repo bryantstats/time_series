@@ -1,0 +1,54 @@
+---
+title: "AYU - Individual Week 8"
+format: 
+  html:
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Instruction**: *Scan your answer into pdf/word document then submit to Canvas.*
+
+## Problem 1
+
+Which one/ones are TRUE in the following statements?
+
+1. ARMA model cannot be used to fit time series with trend.
+
+2. ARIMA model cannot be used to fit time series with trend.
+
+3. One can use differencing technique to transform a trend series to statonary then use ARMA model to fit the transformed series. 
+
+
+## Problem 2
+
+Rewrite the following model using the backshift notation
+
+1. 
+
+$$y_t = 1 + y_{t-1}+.3y_{t-2} - y_{t-7} + \epsilon_t$$
+
+2. 
+
+$$y_t = 1 + y_{t-1}+.3y_{t-2} - y_{t-7} + \epsilon_t + \epsilon_{t-1}+\epsilon_{t-5}$$
+
+## Problem 3
+
+Write the equation of the ARIMA(1,2,1)
+
+## Problem 4
+
+Which one/ones are TRUE in the following statements?
+
+1. If the Mean absolute percentage error
+ (MAPE) of model 1 is lower than the MAPE of model 2 then the AIC of model 1 is also lower than the AIC of model 2.
+ 
+2. If the log-likelihood of model 1 is greater than the log-likelihood of model 2 then the AIC of model 1 is also lower than the AIC of model 2.
+
+
+------------------------------------------------------------------------

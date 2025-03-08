@@ -1,0 +1,195 @@
+---
+title: "AYU - Individual Week 7"
+format: 
+  html:
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Instruction**: *Scan your answer into pdf/word document then submit to Canvas.*
+
+## Problem 1
+
+Given an MA(1) series as follows.
+
+$$y_t = 2024 + .4 \epsilon_{t-1} + \epsilon,$$
+
+where $\epsilon \sim (0, 1)$
+
+- Calculate $E(y_t)$, $V(y_t)$ and the autocorrelation at lag 1 and lag 2. 
+
+
+## Problem 2
+
+Given an MA(2) series as follows.
+
+$$y_t = 2024 + .4 \epsilon_{t-1} +.1 \epsilon_{t-2} + \epsilon$$
+
+where $\epsilon \sim (0, 1)$
+
+- Calculate $E(y_t)$, $V(y_t)$ and the autocorrelation at lag 1, lag 2 and lag 3.
+
+## Problem 3
+
+The following MA models are used to generate the series with the below ACF.  Match the models and the ACF plots. Explain your decision. 
+
+Model A: $y = 1 + .9 \epsilon_{t-1} + .2 \epsilon_{t-2} + .5 \epsilon_{t-3}+ .4 \epsilon_{t-4}+ .5 \epsilon_{t-5} + .6 \epsilon_{t-6} + \epsilon_t$
+
+Model B: $y = 1 + .5 \epsilon_{t-1} + .6 \epsilon_{t-2} + \epsilon_t$
+
+
+Model C: $y = 1 + .5 \epsilon_{t-1} + \epsilon_t$
+
+Model D: $y = 1 + .5 \epsilon_{t-1} + .7 \epsilon_{t-2} + .9 \epsilon_{t-3}+ .8 \epsilon_{t-4}+ \epsilon_t$
+
+- Plot 1
+
+```{r}
+set.seed(1)
+mu = 1
+theta = c(.5)
+y <- arima.sim(list(order=c(0,0,1), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+- Plot 2
+
+```{r}
+set.seed(20)
+theta = c(.5, .6)
+y <- arima.sim(list(order=c(0,0,2), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+- Plot 3
+
+```{r}
+set.seed(12)
+theta = c(.5, .7, .9, .8)
+y <- arima.sim(list(order=c(0,0,4), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+- Plot 4
+
+```{r}
+set.seed(122333)
+theta = c(.9, .2, .5, .4,.5, .6)
+y <- arima.sim(list(order=c(0,0,6), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+
+## Problem 4
+
+The following ACF plots are of series simulated from either an AR(1) OR  MA(1) models. Decide which ACF plots are associated with series simulated from AR(1) and which plots are simulated from MA(1).
+
+
+- Plot 1
+
+```{r}
+set.seed(122333)
+theta = c(.9)
+y <- arima.sim(list(order=c(0,0,1), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+- Plot 2
+
+```{r}
+set.seed(122333)
+theta = c(.9)
+y <- arima.sim(list(order=c(1,0,0), ar=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+
+- Plot 3
+
+```{r}
+set.seed(122333)
+theta = c(-.8)
+y <- arima.sim(list(order=c(1,0,0), ar=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+- Plot 4
+
+```{r}
+set.seed(122333)
+theta = c(-.5)
+y <- arima.sim(list(order=c(0,0,1), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+
+## Problem 5
+
+Suppose that you decide to fit an MA model to the below series.  What order would you consider for the MA model?
+
+
+```{r}
+set.seed(122333)
+theta = c(-.5)
+y <- arima.sim(list(order=c(0,0,1), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+
+## Problem 6
+
+Suppose that you decide to fit an MA model to the series with the below ACF.  What order would you consider for your MA model? Explain your decision. 
+
+
+```{r}
+set.seed(122333)
+theta = c(-.5, .7)
+y <- arima.sim(list(order=c(0,0,2), ma=c(theta)), n=100)
+y <- y + mu
+acf(y)
+```
+
+## Problem 7
+
+Suppose that you decide to fit an AR model to the series with the below ACF.  What order would you consider for your AR model? Explain your decision. 
+
+
+```{r}
+set.seed(122333)
+theta = c(.4, .1, .3)
+y <- arima.sim(list(order=c(3,0,0), ar=c(theta)), n=100)
+y <- y + mu
+pacf(y)
+```
+
+
+## Problem 8
+
+Suppose that you decide to fit an ARMA model to the series with the below ACF and PACF.  What are the values you would consider for the parameters $p$ (the order of the AR component) and $q$ (the order of the MA component) of the ARMA model? Explain your decision. 
+
+
+```{r}
+set.seed(12233)
+theta = c(.4, .1, .3)
+y <- arima.sim(list(order=c(3,0,1), ar=c(theta), ma = c(.6)), n=100)
+y <- y + mu
+acf(y)
+pacf(y)
+```
+
+
+
+------------------------------------------------------------------------

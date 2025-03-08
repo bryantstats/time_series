@@ -1,0 +1,827 @@
+
+---
+title: "Machine Learning Models"
+author: <font size="5"> Son Nguyen </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{css, echo=FALSE}
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+```{r setup, include = FALSE}
+
+# R markdown options
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE,
+                      warning = FALSE)
+
+# Load packages
+library(tidyverse)
+library(forecast)
+library(knitr)
+```
+
+
+# Cross Sectional vs. Time Series Data
+
+-  In week 1 we know the difference between Cross Sectional vs. Time Series Data. 
+
+-   Cross Sectional/tabular Data: Multiple objects observed at a particular point of time
+
+-   Examples: customers' behavioral data at today's update,companies' account balances at the end of the last year,patients' medical records at the end of the current month.
+
+---
+# Cross Sectional vs. Time Series Data
+
+-   Time Series Data: One single object (product, country, sensor, ..) observed over multiple equally-spaced time periods
+
+-   Examples: quarterly Italian GDP of the last 10 years, weekly supermarket sales of the previous year, yesterday's hourly temperature measurements.
+
+
+---
+# Time Series Models
+
+- In time series data, models designed to make connections between the current value of the series and the predictors including the series' past values and the time variable. 
+
+- Some examples of time series models are: AR MA, ARIMA, SARIMA, and Exponential Smoothing Models. 
+
+---
+# Cross Sectional Models
+
+- In cross sectional data, models are designed to make connections between an interested target variable and other predictors. 
+
+- Some examples of models for cross-sectional data are: generalized linear models, random forest, support vector machines, and neural networks. 
+
+- These models can also be called machine learning models. 
+
+- We want to implement these models on time series data.
+
+---
+# ML Models to Time Series 
+
+- Machine learning models include a wide range of models that can be beneficial for time series data.
+
+- Given a time series data, we want to convert it to a cross-sectional data so that we can use all the machine learning models on the data. 
+
+---
+# ML Models to Time Series 
+
+- Given a time series $y_t$, we will convert this series to a cross-sectional/tabular data where the variables/columns are $y_{t-1}$, $y_{t-2}$ and so on
+
+- Let see an example. 
+
+---
+# Example 
+
+Consider the monthly Amtrak ridership between January 1991 and March 2004 in the United States. 
+
+[Download Dataset](Amtrak_data.csv)
+
+---
+# The xts Objects
+
+- We will use the object `xts` instead of `ts` to store a time series. 
+
+- Notice how the time index of the series is defined. 
+
+```{r}
+library(xts)
+
+df = read.csv("Amtrak_data.csv")
+df = na.omit(df) 
+
+time_index = seq(as.Date("1991-01-01"), length=nrow(df), by="months")
+series_values = df$Ridership
+ts_xts = xts(series_values, order.by = time_index)
+```
+
+
+---
+
+```{r}
+plot(ts_xts)
+```
+
+
+---
+# Convert to Tabular Data
+
+- From the time series $y_t$, we will create a tabular data that has variables/columns $y_t$, $y_{t-1}$ (lag1), $y_{t-2}$ (lag2), and $y_{t-3}$ (lag3). 
+
+```{r}
+library(lubridate)
+# Create lag features for time series data
+lags <- 1:3  # Number of lags to consider
+lagged_data <- stats::lag(ts_xts, k = lags)  # Create lagged data
+ 
+# Combine the lagged features into one data frame
+lagged_df <- as_tibble(data.frame(lagged_data))
+colnames(lagged_df) <- paste0("lag", lags)  # Rename columns with lag prefixes
+
+# Merge the lagged features with the original data
+final_data = data.frame(time_index, series_values,  lagged_df)
+```
+
+
+---
+# Convert to Tabular Data
+
+- Let take a look at a few row of the new dataset
+
+```{r}
+head(final_data, 10)
+```
+
+- We can see that there are some missing values, which will be removed later for modeling 
+
+---
+# Prepare Data for Modeling 
+
+- Now that we have a tabular data, we can conveniently implement machine learning models on this data
+
+- We will split the dataset into two subset, one used for training and the other used for testing. 
+
+```{r}
+# Remove rows with NAs created by lagging
+final_data <- na.omit(final_data)
+ 
+# Split the data into training and testing sets
+train_percentage <- 0.7
+train_size <- floor(train_percentage * nrow(final_data))
+train_data <- final_data[1:train_size, ]
+test_data <- final_data[(train_size + 1):nrow(final_data), ]
+```
+
+
+
+```{r, eval=FALSE, echo=FALSE}
+
+# Fit a Random Forest model
+model <- ranger(series_values ~ ., 
+                num.trees = 1000,
+                mtry = 5,
+                data = train_data[, -1])
+ 
+# Make predictions on the test data
+predictions <- predict(model, data = test_data[, -1])$predictions
+ 
+accuracy(test_data$series_values, predictions)
+
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting with Random Forest", y = "series_values")
+
+##################################################
+##################################################
+
+library(gbm)
+# Fit a model
+model <- gbm(series_values ~ ., 
+             n.trees = 100,
+             shrinkage = 0.1,
+             data = train_data[, -1])
+ 
+# Make predictions on the test data
+predictions <- predict(model, newdata = test_data[, -1])
+ 
+accuracy(test_data$series_values, predictions)
+
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+
+##################################################
+##################################################
+```
+
+
+---
+# The Caret Package
+
+- There are a few ways to implement machine learning models in R. We will use the `caret` package. 
+
+- Make sure you install the package (using `install.packages('caret')`) before using it. 
+
+```{r, eval=FALSE}
+install.packages('caret')
+```
+
+
+---
+# Random Forest
+
+- Let see how the `caret` package works.  Let first implement the random forest model. 
+
+```{r, message=FALSE}
+library(caret)
+model <- train(series_values~., 
+               data = train_data[, -1], 
+               method = "ranger") 
+
+predictions <- predict(model, test_data[, -1])
+```
+
+- Notice that `method = "ranger"` indicates that caret call the function `ranger` from the package `ranger` to train a random forest.
+
+- If you run the codes for the first time, you will be asked to install the package `ranger`. Just simply choose `Yes` to install the package when being asked. 
+
+---
+# Model Performance
+
+```{r}
+predictions <- predict(model, test_data[, -1])
+
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+---
+# Model Performance
+
+```{r}
+accuracy(test_data$series_values, predictions)
+```
+
+- We can see that the model do not give the most accurate predictions on the test data. But we can discuss improving the accuracy later. 
+
+---
+# Stepwise Linear Model
+
+To see how convenient it is to implement another machine learning model with caret, We will next implement the Stepwise Linear Model. 
+
+
+```{r}
+library(caret)
+model <- train(series_values~., data = train_data[, -1], 
+                method = "leapSeq") 
+
+predictions <- predict(model, test_data[, -1])
+```
+
+- Notice that we only need to change the `method` argument to call another machine learning model. 
+
+---
+# Model Performance
+
+```{r}
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+
+---
+# Model Performance
+
+```{r}
+accuracy(test_data$series_values, predictions)
+```
+
+---
+# Some notice with caret
+
+- It is very simple to implement a machine learning model with caret!
+
+- Caret gives an universal way to implement machine learning model where we just change the method to change the model. 
+
+- How many methods/models that caret have?  We can see the complete list at
+
+[List of Models in Caret](https://topepo.github.io/caret/available-models.html)
+
+- Notice that the methods that are relevant for our purpose here should have the type `regression`
+
+- Notice that you will be asked to install packages required to run the model for the first time.
+
+
+---
+# Improve Model Performance
+
+- We notice that the two models we implemented do not give the best results. How can we improve the MAPE?
+
+- We can try many other different models!
+
+- We can increase the number of lags! We know that increasing the number of lages used means increasing the number of predictors for the models, which may improve model performances. 
+
+---
+# Increase the number of lags!
+
+- Let increase the number of lags to 36 and re run the two models. 
+
+```{r}
+library(lubridate)
+# Create lag features for time series data
+lags <- 1:36  # Number of lags to consider
+lagged_data <- stats::lag(ts_xts, k = lags)  # Create lagged data
+ 
+# Combine the lagged features into one data frame
+lagged_df <- as_tibble(data.frame(lagged_data))
+colnames(lagged_df) <- paste0("lag", lags)  # Rename columns with lag prefixes
+
+# Merge the lagged features with the original data
+final_data = data.frame(time_index, series_values,  lagged_df)
+
+# Remove rows with NAs created by lagging
+final_data <- na.omit(final_data)
+ 
+# Split the data into training and testing sets
+train_percentage <- 0.7
+train_size <- floor(train_percentage * nrow(final_data))
+train_data <- final_data[1:train_size, ]
+test_data <- final_data[(train_size + 1):nrow(final_data), ]
+```
+
+---
+# Random Forest
+
+```{r, message=FALSE}
+library(caret)
+model <- train(series_values~., 
+               data = train_data[, -1], 
+               method = "ranger") 
+
+predictions <- predict(model, test_data[, -1])
+```
+
+---
+# Model Performance
+
+```{r}
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+- We notice a significant improvement of the model when the number of lags increased from 3 to 36!
+
+---
+# Model Performance
+
+```{r}
+accuracy(test_data$series_values, predictions)
+```
+
+- We notice a significant improvement of the model when the number of lags increased from 3 to 36!
+
+---
+# Stepwise Linear Model
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], 
+                method = "leapSeq") 
+
+predictions <- predict(model, test_data[, -1])
+```
+
+---
+# Model Performance
+
+```{r}
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+- Stepwise Linear Regression gives a very accurate predictions! 
+
+
+---
+# Model Performance
+
+```{r}
+accuracy(test_data$series_values, predictions)
+```
+
+---
+class: middle, inverse, center
+
+# Other Models
+
+---
+# Other Models
+
+In the next slides, we will show the performances of other machine learning models. For the description/information of the caret models, please read at.
+
+[List of Models in Caret](https://topepo.github.io/caret/available-models.html)
+
+---
+# glmnet
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "glmnet") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+---
+# cubist
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "cubist") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+---
+# enet
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "enet") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+# leapForward
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "leapForward") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+
+---
+# leapBackward
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "leapBackward") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+---
+# nnls
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "nnls") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+---
+# rvmPoly
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "rvmPoly") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+---
+# spikeslab
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "spikeslab") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+---
+# gamLoess
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "gamLoess") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+---
+# svmLinear
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "svmLinear") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+---
+# gaussprLinear
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "gaussprLinear") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+
+---
+# gaussprPoly
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "gaussprPoly") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+---
+# gamSpline
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "gamSpline") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+---
+# knn
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "knn") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+---
+# kernelpls
+
+
+```{r}
+model <- train(series_values~., data = train_data[, -1], method = "kernelpls") 
+predictions <- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+```{r, eval=FALSE, echo=FALSE}
+## Neural Network
+library(TTR)
+library(forecast)
+df <- read.csv("Amtrak_data.csv")
+y <- ts(df$Ridership, start = c(1991,1), end = c(2004, 3), freq = 12)
+# data partition
+
+# set the proportion of the test set 
+p = .2 
+
+nValid <- round(.2*length(y))
+nTrain <- length(y) - nValid
+train.ts <- window(y, start = c(1991, 1), end = c(1991, nTrain))
+valid.ts <- window(y, start = c(1991, nTrain + 1), end = c(1991, nTrain + nValid))
+
+
+set.seed(201)
+ridership.nnetar <- nnetar(train.ts, repeats = 20, p = 11, P = 1, size = 7)
+
+summary(ridership.nnetar$model[[1]])
+
+ridership.nnetar.pred <- forecast(ridership.nnetar, h = nValid)
+accuracy(ridership.nnetar.pred, valid.ts)
+plot(train.ts, ylim = c(1300, 2900), ylab = "Ridership", xlab = "Time",
+bty = "l", xaxt = "n", xlim = c(1991,2006.25), lty = 1)
+axis(1, at = seq(1991, 2006, 1), labels = format(seq(1991, 2006, 1)))
+lines(ridership.nnetar.pred$fitted, lwd = 2, col = "blue")
+lines(ridership.nnetar.pred$mean, lwd = 2, col = "blue", lty = 2)
+lines(valid.ts)
+forecast1 = forecast(ridership.nnetar, h = nValid, level = 0)
+
+
+a1 = accuracy(forecast1$mean, valid.ts)
+```
+
+

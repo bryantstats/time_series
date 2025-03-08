@@ -1,0 +1,722 @@
+
+---
+title: "Exponential Smoothing Models"
+author: <font size="5"> Son Nguyen </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{css, echo=FALSE}
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+```{r setup, include = FALSE}
+
+# R markdown options
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE,
+                      warning = FALSE)
+
+# Load packages
+library(tidyverse)
+library(forecast)
+```
+
+
+# Components of Time Series
+
+- We know that a series may have three components: trend, seasonality and cycle. 
+
+- For simplicity, the trend and the cycle are usually combined into one component called trend-cycle or just trend.
+
+Thus, a series can only be one of the three following cases
+
+- (1) Has no trend and no seasonality
+
+- (2) Has trend and no seasonality
+
+- (3) Has trend and seasonality
+
+---
+# Forecasting with ES
+
+We can use exponential smoothing to make forecast for all the three types of time series mentioned earlier. 
+
+- Use `Simple ES` to forecast series with no trend and no seasonality
+
+- Use `Holt’s Method` (or double ES) to forecast series with trend and no seasonality. 
+
+- Use `Holt-Winters Method` (or triple ES): to forecast series with trend and seasonality. 
+
+---
+class: inverse, center, middle
+
+# Simple Exponential Smoothing
+
+
+---
+# Simple Exponential Smoothing
+
+- We use this method to forecast series with a constant level (no trend) and no seasonality.  The equations to calculate the forecast are as follows. 
+
+\begin{align*}
+&\text{Forecast Equation:} &\hat{y}_{t+h} &=  l_t \\
+&\text{Level Equation:}    &l_t           &=  \alpha y_t + (1-\alpha)l_{t-1}
+\end{align*}
+
+- We observe that  $w = 1- \alpha$ in exponential smoothing that we defined last week. 
+
+- The forecast calculation needs two parameters  $l_0$ (initial level) and $\alpha$ (smoothing parameter)
+
+---
+# Parameters Estimation
+
+- We notice that different parameters ( $l_0$ and $\alpha$) will yield different forecasting
+
+- What would be the parameters yield the best forecasting?
+
+- The bets parameters are the parameters that produces $\hat{y}_t$ that minimizes the sum squares errors (SSE)
+
+$$
+SSE = \sum_{t=1}^T(y_t - \hat{y}_t)
+$$
+
+---
+# SES in R
+
+- We will use SES to make forecast for the time series of annual rainfall in London since 1813. 
+
+[Dataset](data/rainfall_london.csv)
+
+---
+# SES in R
+
+- We first plot the series to see if we could use SES to make forecasts. 
+
+```{r}
+library(forecast)
+rain <- read.csv('data/rainfall_london.csv')
+y <- ts(rain,start=c(1813))
+plot(y)
+```
+
+- The plot indicates that the series has no trend and no seasonality.  So we can use SES on this series. 
+
+
+---
+# SES in R
+
+- We can use function `ses` to implement SES
+
+```{r}
+y_h = ses(y, h = 5)
+y_h$model
+```
+
+- What are the best parameters for this SES?  We notice that $\alpha = 1e-04$ and $l_0 = 24.8243$
+
+---
+# SES in R
+
+- Plot the smoothed series
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+- We notice that the smoothed series since $\alpha \approx 0$, the smoothing is at its maximum where the smoothed series is just the average of the original series (and vice versa, $\alpha = 1$ would make the smoothed series the same as the original series, or no smoothing at all).   
+
+---
+# SES in R
+
+- Make the forecast
+
+```{r}
+y_h
+```
+
+- The forecast is a constant going to the future
+
+---
+# SES in R
+
+- Plot the forecast
+
+```{r}
+plot(y_h)
+```
+
+---
+# Problem 1
+
+Given the following time series $y_t$.     
+
+```{r, echo=FALSE}
+library(knitr)
+y = ts(c(2.5, 3, 1.7, 2, 2.8))
+kable(tibble(t = c(1:length(y)), y = y))
+```
+
+- Assume that the series does not have the trend and seasonality component. What is the parameters of simple exponential smoothing that best forecast the series? 
+
+- Make a forecast using the SES with these parameters to forecast the three next values of the series.
+
+---
+# Solution
+
+- We will use R to solve this problem.  We first create the series then use the `ses` function to find the best parameters. 
+
+```{r}
+# Create the series using the ts function
+y = ts(c(2.5, 3, 1.7, 2, 1.8))
+
+# implement SES 
+y_h = ses(y, h = 3)
+y_h$model
+```
+
+- We observe that the best parameters are $l_0 = 2.5$ and $\alpha = 0.3869$
+
+---
+# Solution
+
+The forecast of the three next values are
+
+```{r}
+y_h
+```
+
+---
+# Solution
+
+The forecast of the three next values are
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+
+
+---
+class: middle, inverse, center
+
+# Holt's Method
+
+
+
+---
+# Holt's Method
+
+- We use this method to forecast series with a constant trend and no seasonality.  The equations to calculate the forecast are as follows. 
+
+\begin{align*}
+&\text{Forecast Equation:} &\hat{y}_{t+h} &=  l_t + hb_t \\
+&\text{Level Equation:}    &l_t           &=  \alpha y_t + (1-\alpha)(l_{t-1}+b_{t-1}) \\
+&\text{Trend Equation:}    &b_t           &=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*})b_{t-1}
+\end{align*}
+
+- The forecast calculation needs the following parameters
+
+    - $l_0$ (initial level value), 
+    - $b_0$ (initial trend value)
+    - $\alpha$ (level smoothing parameter) and 
+    - $\beta^{*}$ (trend smoothing parameter)
+    
+- Similar to the SES model, these parameters are estimated by minimizing the $SSE = \sum_{t=1}^T(y_t - \hat{y}_t)$
+
+
+---
+# Example
+
+- Let consider the series of total annual air passengers including domestic and international aircraft passengers of air carriers registered in Australia. 1970-2009.
+
+[Dataset](data/ausair.csv)
+
+---
+# Example
+
+- Plot the series
+
+```{r}
+df <- read.csv('data/ausair.csv')
+y = ts(df, start = c(1970), frequency = 1)
+plot(y)
+```
+
+- We observe that the series has a trend (upward) so we can use Holt's method to make forecast for this series
+
+
+---
+# Example
+
+- We use the `holt` function to implement the Holt's method as follows
+
+```{r}
+y_h <- holt(y, h=5)
+y_h$model
+```
+
+- We can read the estimated parameters from the results.
+
+---
+# Example
+
+- Plot the smoothed series
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+---
+# Example
+
+- Plot the smoothed series
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+- Since $\alpha = 0.848$ are quite large (closer to 1), the smoothing is very light making the smoothed series is very close to the original series. 
+
+---
+# Example
+
+- Make the forecast
+
+```{r}
+y_h
+```
+
+
+---
+# Example
+
+- Plot the forecast
+
+```{r}
+plot(y_h)
+```
+
+
+
+---
+class: middle, inverse, center
+
+# Damped trend methods
+
+
+---
+# Damped trend methods
+
+- Holt’s method produce a linear forecasting into the future. The slope of this linear trend is a constant
+
+- Empirical evidence indicates that these methods tend to over-forecast, especially for longer forecast horizons.
+
+- The Damped trend methods introduced a parameter that “dampens” the trend to a flat line some time in the future. 
+
+- Damped trend methods have proven to be very successful, and are among the most popular individual methods. 
+
+
+---
+# Damped trend methods
+
+- We use this method to forecast series with a constant trend and no seasonality.  The equations to calculate the forecast are as follows. 
+
+\begin{align*}
+&\text{Forecast Equation:} &\hat{y}_{t+h} &=  l_t + (\phi + \phi^2 + ... + \phi^h)b_t \\
+&\text{Level Equation:}    &l_t           &=  \alpha y_t + (1-\alpha)(l_{t-1}+\phi b_{t-1}) \\
+&\text{Trend Equation:}    &b_t           &=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*})\phi b_{t-1}
+\end{align*}
+
+- The forecast calculation needs the following parameters
+
+    - $l_0$ (initial level value), 
+    - $b_0$ (initial trend value)
+    - $\alpha$ (level smoothing parameter) and 
+    - $\beta^{*}$ (trend smoothing parameter)
+    - $\phi$, damping parameter, $0 < \phi <1$
+    
+- Notice that when $\phi = 1$, the Damped trend methods become the Holt's method
+
+- In practice, $\phi$ is usually chosen from .8 to .98
+
+
+---
+# Example
+
+- We use the same `holt` function to implement the method. 
+
+```{r}
+y_h <- holt(y, damped = TRUE, h=5)
+y_h$model
+```
+
+- We can read the estimated parameters from the results.
+
+---
+# Example
+
+- Plot the smoothed series
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+---
+# Example
+
+- Plot the forecast
+
+```{r}
+plot(y_h)
+```
+
+
+---
+# Problem 2
+
+Given the following time series $y_t$.     
+
+```{r, echo=FALSE}
+library(knitr)
+y = ts(c(2.5, 3, 4.7, 5, 7.8, 9, 10, 11, 12, 12.5))
+kable(tibble(t = c(1:length(y)), y = y))
+```
+
+- Assume that the series have the trend and no seasonality component. What is the parameters of Holt's method that best forecast the series? 
+
+- Make a forecast for the next value of the series
+
+---
+# Solution
+
+- We will use R to solve this problem. 
+
+```{r}
+# Create the series using the ts function
+y = ts(c(2.5, 3, 4.7, 5, 7.8, 9, 10, 11, 12, 12.5))
+
+# implement Holt 
+y_h = holt(y, h = 1)
+y_h$model
+```
+- The best parameters are found above
+
+---
+# Solution
+
+The forecast of the three next values are
+
+```{r}
+y_h
+```
+
+---
+# Solution
+
+The forecast of the three next values are
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+---
+# Problem 3
+
+Given the following time series $y_t$.     
+
+```{r, echo=FALSE}
+library(knitr)
+y = ts(c(2.5, 3, 4.7, 5, 7.8, 9, 10, 11, 12, 12.5))
+kable(tibble(t = c(1:length(y)), y = y))
+```
+
+- Assume that the series have the trend and seasonality component. What is the parameters of Damped Holt's method that best forecast the series? 
+
+- Make a forecast for the next value of the series
+
+
+---
+# Solution
+
+- We will use R to solve this problem. The parameters are as follows.
+
+```{r}
+# Create the series using the ts function
+y = ts(c(2.5, 3, 4.7, 5, 7.8, 9, 10, 11, 12, 12.5))
+
+# implement Holt 
+y_h = holt(y, damped =  TRUE, h = 1)
+y_h$model
+```
+- The forecast of the next value is
+
+```{r}
+y_h
+```
+
+
+---
+class: middle, inverse, center
+
+# Holt-Winters’ seasonal method
+
+---
+# Holt-Winters’ seasonal method
+
+- We use this method to forecast series with a trend and seasonality.  
+
+- There are two variations to this method that differ in the nature of the seasonal component 
+
+    - Holt-Winters’ additive method
+    
+    - Holt-Winters’ multiplicative method
+
+
+---
+# Holt-Winters’ additive method
+
+Holt-Winters’ additive method's Equations are as follows. 
+
+\begin{align*}
+&\text{Forecast Equation:} &\hat{y}_{t+h} &=  l_t + hb_t + s_{t+h-mk-m} \\
+&\text{Level Equation:}    &l_t           &=  \alpha (y_t - s_{t-m} + (1-\alpha)(l_{t-1}+ b_{t-1}) \\
+&\text{Trend Equation:}    &b_t           &=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*}) b_{t-1} \\
+&\text{Seasonal Equation:}    &s_t           &=  \gamma (y_t - l_{t-1} - b_{t-1}) + (1-\gamma) s_{t-m}
+\end{align*}
+
+- The forecast calculation needs six parameters
+
+    - $l_0$ (initial level value), 
+    - $b_0$ (initial trend value)
+    - $s_0$ (initial trend value)
+    - $\alpha$ (level smoothing parameter) and 
+    - $\beta^{*}$ (trend smoothing parameter)
+    - $\gamma$ (seasonal smoothing parameter)
+    
+    
+---
+# Holt-Winters’ multiplicative method    
+    
+Holt-Winters’ additive method's Equations are as follows. 
+
+\begin{align*}
+&\text{Forecast Equation:} &\hat{y}_{t+h} &=  (l_t + hb_t)s_{t+h-mk-m} \\
+&\text{Level Equation:}    &l_t           &=  \alpha (y_t/s_{t-m} + (1-\alpha)(l_{t-1}+ b_{t-1}) \\
+&\text{Trend Equation:}    &b_t           &=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*}) b_{t-1} \\
+&\text{Seasonal Equation:}    &s_t           &=  \gamma y_t/(l_{t-1} - b_{t-1}) + (1-\gamma) s_{t-m}
+\end{align*}
+
+- The forecast calculation needs six parameters
+
+    - $l_0$ (initial level value), 
+    - $b_0$ (initial trend value)
+    - $s_0$ (initial trend value)
+    - $\alpha$ (level smoothing parameter) and 
+    - $\beta^{*}$ (trend smoothing parameter)
+    - $\gamma$ (seasonal smoothing parameter)
+     
+---
+# Example
+
+- We study the Quarterly visitor nights (in millions) spent by international tourists to Australia. 1999-2015.
+
+[Dataset](data/austourists.csv)
+
+```{r}
+df <- read.csv('data/austourists.csv')
+y = ts(df, start = c(1999), frequency = 4)
+
+plot(y)
+```    
+
+- The plot shows the trend and the seasonal component of the series.  Thus, we can use the HW method on this series
+
+---
+# Example
+
+- Holt-Winters' additive method 
+
+```{r}
+y_h <- hw(y,seasonal="additive")
+y_h$model
+```
+
+---
+# Example
+
+- Plot the smoothed series
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+---
+# Example
+
+- Plot the forecast
+
+```{r}
+plot(y_h)
+```
+
+
+---
+# Example
+
+- We can easily switch to the multiplicative model
+
+```{r}
+y_h <- hw(y,seasonal="multiplicative")
+y_h$model
+```
+
+---
+# Example
+
+- Plot the smoothed series
+
+```{r}
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+
+---
+# Example
+
+- Plot the forecast
+
+```{r}
+plot(y_h)
+```
+    
+    
+---
+# Additive vs. Multiplicative Model
+
+
+- The forecasts generated by the method with the multiplicative seasonality display larger and increasing seasonal variation. 
+
+- Thus for series that has increasing size of the seasonal component we would prefer the multiplicative model
+
+
+---
+# Additive vs. Multiplicative Model
+
+- Let's take a closer look at the series in the previous example
+
+```{r, echo=FALSE}
+plot(y)
+```
+
+- We observe that the seasonal variation of the series seems to increase overtime.  Thus, the multiplicative model may fit the series better
+
+- However, we can always use both models and evaluate the forecast performance on a separate dataset to decide which model make a better forecast
+
+---
+# Holt-Winters’ damped method
+
+- Damping is possible with both additive and multiplicative Holt-Winters’ methods
+
+```{r}
+y_h <- hw(y,seasonal="additive", damped = TRUE)
+plot(y_h)
+```
+

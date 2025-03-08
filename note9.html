@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Machine Learning Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" Son Nguyen " />
+    <script src="libs/header-attrs-2.26/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Machine Learning Models
+]
+.author[
+### <font size="5"> Son Nguyen </font>
+]
+
+---
+
+
+&lt;style&gt;
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide &gt; h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide &gt; h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide &gt; h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+&lt;/style&gt;
+
+
+
+
+# Cross Sectional vs. Time Series Data
+
+-  In week 1 we know the difference between Cross Sectional vs. Time Series Data. 
+
+-   Cross Sectional/tabular Data: Multiple objects observed at a particular point of time
+
+-   Examples: customers' behavioral data at today's update,companies' account balances at the end of the last year,patients' medical records at the end of the current month.
+
+---
+# Cross Sectional vs. Time Series Data
+
+-   Time Series Data: One single object (product, country, sensor, ..) observed over multiple equally-spaced time periods
+
+-   Examples: quarterly Italian GDP of the last 10 years, weekly supermarket sales of the previous year, yesterday's hourly temperature measurements.
+
+
+---
+# Time Series Models
+
+- In time series data, models designed to make connections between the current value of the series and the predictors including the series' past values and the time variable. 
+
+- Some examples of time series models are: AR MA, ARIMA, SARIMA, and Exponential Smoothing Models. 
+
+---
+# Cross Sectional Models
+
+- In cross sectional data, models are designed to make connections between an interested target variable and other predictors. 
+
+- Some examples of models for cross-sectional data are: generalized linear models, random forest, support vector machines, and neural networks. 
+
+- These models can also be called machine learning models. 
+
+- We want to implement these models on time series data.
+
+---
+# ML Models to Time Series 
+
+- Machine learning models include a wide range of models that can be beneficial for time series data.
+
+- Given a time series data, we want to convert it to a cross-sectional data so that we can use all the machine learning models on the data. 
+
+---
+# ML Models to Time Series 
+
+- Given a time series `\(y_t\)`, we will convert this series to a cross-sectional/tabular data where the variables/columns are `\(y_{t-1}\)`, `\(y_{t-2}\)` and so on
+
+- Let see an example. 
+
+---
+# Example 
+
+Consider the monthly Amtrak ridership between January 1991 and March 2004 in the United States. 
+
+[Download Dataset](Amtrak_data.csv)
+
+---
+# The xts Objects
+
+- We will use the object `xts` instead of `ts` to store a time series. 
+
+- Notice how the time index of the series is defined. 
+
+
+```r
+library(xts)
+
+df = read.csv("Amtrak_data.csv")
+df = na.omit(df) 
+
+time_index = seq(as.Date("1991-01-01"), length=nrow(df), by="months")
+series_values = df$Ridership
+ts_xts = xts(series_values, order.by = time_index)
+```
+
+
+---
+
+
+```r
+plot(ts_xts)
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Convert to Tabular Data
+
+- From the time series `\(y_t\)`, we will create a tabular data that has variables/columns `\(y_t\)`, `\(y_{t-1}\)` (lag1), `\(y_{t-2}\)` (lag2), and `\(y_{t-3}\)` (lag3). 
+
+
+```r
+library(lubridate)
+# Create lag features for time series data
+lags &lt;- 1:3  # Number of lags to consider
+lagged_data &lt;- stats::lag(ts_xts, k = lags)  # Create lagged data
+ 
+# Combine the lagged features into one data frame
+lagged_df &lt;- as_tibble(data.frame(lagged_data))
+colnames(lagged_df) &lt;- paste0("lag", lags)  # Rename columns with lag prefixes
+
+# Merge the lagged features with the original data
+final_data = data.frame(time_index, series_values,  lagged_df)
+```
+
+
+---
+# Convert to Tabular Data
+
+- Let take a look at a few row of the new dataset
+
+
+```r
+head(final_data, 10)
+```
+
+```
+##    time_index series_values     lag1     lag2     lag3
+## 1  1991-01-01      1708.917       NA       NA       NA
+## 2  1991-02-01      1620.586 1708.917       NA       NA
+## 3  1991-03-01      1972.715 1620.586 1708.917       NA
+## 4  1991-04-01      1811.665 1972.715 1620.586 1708.917
+## 5  1991-05-01      1974.964 1811.665 1972.715 1620.586
+## 6  1991-06-01      1862.356 1974.964 1811.665 1972.715
+## 7  1991-07-01      1939.860 1862.356 1974.964 1811.665
+## 8  1991-08-01      2013.264 1939.860 1862.356 1974.964
+## 9  1991-09-01      1595.657 2013.264 1939.860 1862.356
+## 10 1991-10-01      1724.924 1595.657 2013.264 1939.860
+```
+
+- We can see that there are some missing values, which will be removed later for modeling 
+
+---
+# Prepare Data for Modeling 
+
+- Now that we have a tabular data, we can conveniently implement machine learning models on this data
+
+- We will split the dataset into two subset, one used for training and the other used for testing. 
+
+
+```r
+# Remove rows with NAs created by lagging
+final_data &lt;- na.omit(final_data)
+ 
+# Split the data into training and testing sets
+train_percentage &lt;- 0.7
+train_size &lt;- floor(train_percentage * nrow(final_data))
+train_data &lt;- final_data[1:train_size, ]
+test_data &lt;- final_data[(train_size + 1):nrow(final_data), ]
+```
+
+
+
+
+
+
+---
+# The Caret Package
+
+- There are a few ways to implement machine learning models in R. We will use the `caret` package. 
+
+- Make sure you install the package (using `install.packages('caret')`) before using it. 
+
+
+```r
+install.packages('caret')
+```
+
+
+---
+# Random Forest
+
+- Let see how the `caret` package works.  Let first implement the random forest model. 
+
+
+```r
+library(caret)
+model &lt;- train(series_values~., 
+               data = train_data[, -1], 
+               method = "ranger") 
+```
+
+```
+## note: only 2 unique complexity parameters in default grid. Truncating the grid to 2 .
+```
+
+```r
+predictions &lt;- predict(model, test_data[, -1])
+```
+
+- Notice that `method = "ranger"` indicates that caret call the function `ranger` from the package `ranger` to train a random forest.
+
+- If you run the codes for the first time, you will be asked to install the package `ranger`. Just simply choose `Yes` to install the package when being asked. 
+
+---
+# Model Performance
+
+
+```r
+predictions &lt;- predict(model, test_data[, -1])
+
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Model Performance
+
+
+```r
+accuracy(test_data$series_values, predictions)
+```
+
+```
+##                 ME     RMSE      MAE       MPE     MAPE
+## Test set -203.7164 258.5943 224.1282 -11.57929 12.71783
+```
+
+- We can see that the model do not give the most accurate predictions on the test data. But we can discuss improving the accuracy later. 
+
+---
+# Stepwise Linear Model
+
+To see how convenient it is to implement another machine learning model with caret, We will next implement the Stepwise Linear Model. 
+
+
+
+```r
+library(caret)
+model &lt;- train(series_values~., data = train_data[, -1], 
+                method = "leapSeq") 
+
+predictions &lt;- predict(model, test_data[, -1])
+```
+
+- Notice that we only need to change the `method` argument to call another machine learning model. 
+
+---
+# Model Performance
+
+
+```r
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Model Performance
+
+
+```r
+accuracy(test_data$series_values, predictions)
+```
+
+```
+##                 ME     RMSE      MAE       MPE     MAPE
+## Test set -129.4467 188.8847 169.9167 -7.031954 9.183403
+```
+
+---
+# Some notice with caret
+
+- It is very simple to implement a machine learning model with caret!
+
+- Caret gives an universal way to implement machine learning model where we just change the method to change the model. 
+
+- How many methods/models that caret have?  We can see the complete list at
+
+[List of Models in Caret](https://topepo.github.io/caret/available-models.html)
+
+- Notice that the methods that are relevant for our purpose here should have the type `regression`
+
+- Notice that you will be asked to install packages required to run the model for the first time.
+
+
+---
+# Improve Model Performance
+
+- We notice that the two models we implemented do not give the best results. How can we improve the MAPE?
+
+- We can try many other different models!
+
+- We can increase the number of lags! We know that increasing the number of lages used means increasing the number of predictors for the models, which may improve model performances. 
+
+---
+# Increase the number of lags!
+
+- Let increase the number of lags to 36 and re run the two models. 
+
+
+```r
+library(lubridate)
+# Create lag features for time series data
+lags &lt;- 1:36  # Number of lags to consider
+lagged_data &lt;- stats::lag(ts_xts, k = lags)  # Create lagged data
+ 
+# Combine the lagged features into one data frame
+lagged_df &lt;- as_tibble(data.frame(lagged_data))
+colnames(lagged_df) &lt;- paste0("lag", lags)  # Rename columns with lag prefixes
+
+# Merge the lagged features with the original data
+final_data = data.frame(time_index, series_values,  lagged_df)
+
+# Remove rows with NAs created by lagging
+final_data &lt;- na.omit(final_data)
+ 
+# Split the data into training and testing sets
+train_percentage &lt;- 0.7
+train_size &lt;- floor(train_percentage * nrow(final_data))
+train_data &lt;- final_data[1:train_size, ]
+test_data &lt;- final_data[(train_size + 1):nrow(final_data), ]
+```
+
+---
+# Random Forest
+
+
+```r
+library(caret)
+model &lt;- train(series_values~., 
+               data = train_data[, -1], 
+               method = "ranger") 
+
+predictions &lt;- predict(model, test_data[, -1])
+```
+
+---
+# Model Performance
+
+
+```r
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+
+- We notice a significant improvement of the model when the number of lags increased from 3 to 36!
+
+---
+# Model Performance
+
+
+```r
+accuracy(test_data$series_values, predictions)
+```
+
+```
+##                 ME     RMSE     MAE       MPE     MAPE
+## Test set -121.7856 153.0521 133.448 -6.461574 7.088693
+```
+
+- We notice a significant improvement of the model when the number of lags increased from 3 to 36!
+
+---
+# Stepwise Linear Model
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], 
+                method = "leapSeq") 
+
+predictions &lt;- predict(model, test_data[, -1])
+```
+
+---
+# Model Performance
+
+
+```r
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = "Time Series Forecasting", y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+- Stepwise Linear Regression gives a very accurate predictions! 
+
+
+---
+# Model Performance
+
+
+```r
+accuracy(test_data$series_values, predictions)
+```
+
+```
+##                 ME     RMSE      MAE        MPE     MAPE
+## Test set -16.66567 68.48101 54.38682 -0.8946822 2.802505
+```
+
+---
+class: middle, inverse, center
+
+# Other Models
+
+---
+# Other Models
+
+In the next slides, we will show the performances of other machine learning models. For the description/information of the caret models, please read at.
+
+[List of Models in Caret](https://topepo.github.io/caret/available-models.html)
+
+---
+# glmnet
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "glmnet") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# cubist
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "cubist") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# enet
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "enet") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-24-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+# leapForward
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "leapForward") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+---
+# leapBackward
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "leapBackward") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# nnls
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "nnls") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# rvmPoly
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "rvmPoly") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-28-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# spikeslab
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "spikeslab") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# gamLoess
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "gamLoess") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# svmLinear
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "svmLinear") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# gaussprLinear
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "gaussprLinear") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+---
+# gaussprPoly
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "gaussprPoly") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# gamSpline
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "gamSpline") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# knn
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "knn") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+# kernelpls
+
+
+
+```r
+model &lt;- train(series_values~., data = train_data[, -1], method = "kernelpls") 
+predictions &lt;- predict(model, test_data[, -1])
+ggplot(final_data) +
+  geom_line(aes(x = time_index, y = series_values, color = "Original")) +
+  geom_line(data = test_data, aes(x = time_index, y = predictions, color = "Forecast")) +
+  scale_color_manual(values = c("Original" = "blue", "Forecast" = "red")) +
+  labs(title = paste0("MAPE: ", accuracy(test_data$series_values, predictions)[5]), y = "series_values")
+```
+
+&lt;img src="note9_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

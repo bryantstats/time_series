@@ -1,0 +1,966 @@
+
+---
+title: "Autoregressive Models"
+author: <font size="5"> Son Nguyen </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{css, echo=FALSE}
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+
+```{r setup, include = FALSE}
+
+# R markdown options
+knitr::opts_chunk$set(echo = TRUE, 
+                      
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE,
+                      warning = FALSE)
+
+# Load packages
+library(tidyverse)
+library(forecast)
+```
+
+# Linear Models
+
+- We learn that in linear model that we can linearly regress a time series $y_t$ on a time series $x_t$ 
+
+$$
+y_t = \beta_0 + \beta_1 x_t + \epsilon_t
+$$
+
+
+- If the series $x_t$ happens to be a previous values of $y_t$, i.e., $x_t = y_{t-1}$, we can say that we regress $y_t$ on it past self, or auto-regress, and the model would become autoregressive model. 
+
+---
+# Autoregressive model - AR(1)
+
+Specifically, a time series $y_t$ is called a *first-order autoregressive model*, or AR(1) if
+
+\begin{equation}
+y_{t} = \beta_0 + \beta_1 y_{t-1} + \epsilon_t
+\end{equation}
+
+where $|\beta_1| < 1$, $\epsilon_t \sim (0, \sigma^2)$  and $\epsilon_{t+k}$ is independent of $y_t$ for any $t >0$ and $k>0$.
+
+- Three parameters of the models are $\beta_0, \beta_1,$ and $\sigma^2$
+
+---
+# AR(1)
+
+- Why we need the condition $|\beta_1| < 1$?.  
+
+- Let's simulate a few series from the model $y_{t} = \beta_0 + \beta_1 y_{t-1} + \epsilon_t$ to see the effect of the slope coefficient $\beta_1$
+
+---
+# Simulation
+
+- We notice from the codes that the today's value, $y_t$, is a linear function of yesterday's value, $y_{t-1}$.  Thus, the process of generating $y_t$ needs to be initiated by $y_1$. 
+
+.left-code[
+```{r s1, eval = FALSE, echo = TRUE}
+library(ggfortify)
+set.seed(2023)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = .01
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+autoplot(ts(y)) + ggtitle(paste0("An Autoregressive series with beta1 = ",b1))
+
+```
+]
+.right-plot[
+```{r, ref.label = "s1", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
+```
+]
+
+---
+# AR(1)
+
+- We will increase the value of $|\beta_1|$ to see its effect. 
+
+.left-code[
+```{r s2, eval = FALSE, echo = TRUE}
+set.seed(2023)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = .5
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+autoplot(ts(y)) + ggtitle(paste0("An Autoregressive series with beta1 = ",b1))
+
+```
+]
+.right-plot[
+```{r, ref.label = "s2", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
+```
+]
+
+---
+# AR(1)
+
+- We will increase the value of $|\beta_1|$ to see its effect. 
+
+.left-code[
+```{r s3, eval = FALSE, echo = TRUE}
+set.seed(2023)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = .9
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+autoplot(ts(y)) + ggtitle(paste0("An Autoregressive series with beta1 = ",b1))
+
+```
+]
+.right-plot[
+```{r, ref.label = "s3", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
+```
+]
+
+
+---
+# AR(1)
+
+.left-code[
+```{r s3a, eval = FALSE, echo = TRUE}
+set.seed(2023)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = -.8
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+autoplot(ts(y)) + ggtitle(paste0("An Autoregressive series with beta1 = ",b1))
+
+```
+]
+.right-plot[
+```{r, ref.label = "s3a", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
+```
+]
+
+
+---
+# AR(1)
+
+- Notice when $\beta_1 = 1$, we have a random walk (non-stationary). 
+
+.left-code[
+```{r s4, eval = FALSE, echo = TRUE}
+set.seed(2023)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = 1
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+autoplot(ts(y)) + ggtitle(paste0("With beta1 = ",b1))
+
+```
+]
+.right-plot[
+```{r, ref.label = "s4", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
+```
+]
+
+---
+# AR(1)
+
+- Notice when $|\beta_1| >1$ the series will diverse (non-stationary).
+
+.left-code[
+```{r s5, eval = FALSE, echo = TRUE}
+set.seed(2023)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = 1.1
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+autoplot(ts(y)) + ggtitle(paste0("With beta1 = ",b1))
+
+```
+]
+.right-plot[
+```{r, ref.label = "s5", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
+```
+]
+
+
+---
+# AR(1)
+
+- Notice when $|\beta_1| >1$ the series will diverse (non-stationary).
+
+.left-code[
+```{r s5a, eval = FALSE, echo = TRUE}
+set.seed(2023)
+n = 100
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = -1.01
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+autoplot(ts(y)) + ggtitle(paste0("With beta1 = ",b1))
+
+```
+]
+.right-plot[
+```{r, ref.label = "s5a", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
+```
+]
+
+---
+# Observations
+
+Some observations from the simulation
+
+- When $|\beta_1| = 1$, the series is a random walk, and hence non-stationary
+
+- When $|\beta_1| > 1$, the series is diverse, and hence non stationary
+
+- When $|\beta_1| <1$, the series is stationary.
+
+- Thus, we keep the condition $|\beta_1| < 1$ for the auto-regression model so that the series is stationary. 
+
+---
+# Simulating AR(1)
+
+We can conveniently simulate AR(1) using `arima.sim` function. 
+
+- Notice that the order is always `order=c(1,0,0)` for auto-regression model. 
+
+```{r}
+# generate an autoregression with slope beta1 = .7 and beta0 = 10
+b0 = 10
+y <- arima.sim(list(order=c(1,0,0), ar=.7), n=1000)
+y <- y + b0
+plot(y)
+```
+
+
+---
+# Another form
+
+Suppose that we have an autoregression model with $|\beta_1|<1$
+
+$$y_t = \beta_0 + \beta_1 y_{t-1} + \epsilon_t$$
+
+Let the mean of the series be $\mu$, we have $E(y_t) =  E(y_{t-1})=\mu$. Thus, taking the expectation on both sides, we have 
+
+\begin{align}
+E\bigg(y_t\bigg) &=E\bigg(\beta_0 + \beta_1 y_{t-1} + \epsilon_t\bigg)\\
+E\bigg(y_t\bigg) &=\beta_0 + \beta_1 E \bigg( y_{t-1}\bigg) + E \bigg(  \epsilon_t\bigg)\\
+\implies \mu &= \beta_0 + \beta_1 \mu \\
+\implies \beta_0 &= \mu-\mu\beta_1
+\end{align}
+
+Notice that $E \big(\epsilon_t\big) = 0$ Hence, we can rewrite the equation in term of $\mu$ and $\beta_1$ as
+
+\begin{align}
+y_t &= \beta_0 + \beta_1 y_{t-1} + \epsilon_t\\
+\implies y_t &= (\mu-\mu\beta_1) + \beta_1 y_{t-1} + \epsilon_t\\
+\implies y_{t} - \mu &= \beta_1 (y_{t-1}-\mu) + \epsilon_t
+\end{align}
+
+---
+# Another form
+
+Therefore, the AR(1) model can be written as
+
+\begin{align}
+y_{t} - \mu &= \beta_1 (y_{t-1}-\mu) + \epsilon_t
+\end{align}
+
+where $E(y_t) = \mu.$
+
+---
+# Mean and Variance
+
+From the previous calculation, we have 
+
+$$\mu = \frac{\beta_0}{1-\beta_1}$$
+
+Taking the variance from both sides of the model equation and notice $V(y_t) = V(y_{t-1})$ due to stationarity, we have
+
+\begin{align}
+V\bigg(y_t\bigg) &= V\bigg(\beta_0 + \beta_1 y_{t-1} + \epsilon_t\bigg)\\
+&= \beta_1^2 V(y_{t-1}) + V(\epsilon_t)\\
+&= \beta_1^2 V(y_{t}) + V(\epsilon_t)
+\end{align}
+
+Therefore,
+
+$$V(y_t) = \frac{\sigma^2_e}{1 - \beta^2_1}$$
+where $\sigma^2_{\epsilon} = V(\epsilon)$. 
+
+
+---
+# Auto-Correlation
+
+Notice that one of the condition of AR(1) is that $\epsilon_{t+k}$ and $y_t$ are independent. Thus, $Cov(\epsilon_t, y_{t-k}) = 0$.  Therefore,
+
+\begin{align}
+Cov(y_t, y_{t-k}) &=  Cov \big(\beta_0 + \beta_1 y_{t-1} + \epsilon_t, y_{t-k}\big)\\
+&=  Cov \big(\beta_1 y_{t-1} + \epsilon_t, y_{t-k}\big) \\
+&=  Cov \big(\beta_1 y_{t-1}, y_{t-k} \big) + Cov(\epsilon_t, y_{t-k}\big)\\
+&=  \beta_1 Cov \big(y_{t-1}, y_{t-k} \big)
+\end{align}
+
+Inductively, $Cov \big(y_{t-1}, y_{t-k} \big) = \beta_1 Cov \big(y_{t-2}, y_{t-k} \big)$. Therefore, 
+
+\begin{align}
+Cov(y_t, y_{t-k}) &=  Cov \big(\beta_0 + \beta_1 y_{t-1} + \epsilon_t, y_{t-k}\big)\\
+&=  \beta_1 Cov \big(y_{t-1}, y_{t-k} \big) \\
+&=  \beta^2_1 Cov \big(y_{t-2}, y_{t-k} \big) \\
+&=  ...\\
+&=  \beta^k_1 Cov \big(y_{t-k}, y_{t-k} \big) \\
+&=  \beta^k_1V(y_t)
+\end{align}
+
+---
+# Auto-Correlation
+
+Therefore,
+
+\begin{align}
+\beta^k_1 = \frac{Cov \big(y_{t-k}, y_{t-k} \big) }{V(y_t)}
+\end{align}
+
+- The left hand side of the above equation is the lag-k autocorrelation of the series is $\beta^k_1$. 
+
+- Thus, as the lag-k $\to \infty$, $\beta^k_1 \to 0$ or the auto-correlation dies out to zero exponentially. 
+
+- We will simulate a few AR(1) series and observe this. 
+
+---
+# ACF
+
+- For a positive value of $\beta_1$ the ACF exponentially decreases to 0 as the lag increases
+
+```{r}
+y <- arima.sim(list(order=c(1,0,0), ar=.5), n=1000)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+
+---
+# ACF
+
+- The greater the absolute value of the slope, the more slowly the ACF dies out to zeros. 
+
+```{r}
+y <- arima.sim(list(order=c(1,0,0), ar=.9), n=1000)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+---
+# ACF
+
+- For negative $\beta_1$ the ACF also exponentially decays to 0 as the lag increases, but the algebraic signs for the autocorrelations alternate between positive and negative
+
+```{r}
+y <- arima.sim(list(order=c(1,0,0), ar=-.6), n=1000)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+
+---
+# ACF
+
+- The greater the absolute value of the slope, the more slowly the ACF dies out to zeros. 
+
+```{r}
+y <- arima.sim(list(order=c(1,0,0), ar=-.9), n=1000)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+
+---
+class: center, middle, inverse
+# Parameter Estimation
+
+---
+# Fit Models to Data
+
+- From AR(1) models, we can generate/simulate time series data.
+
+- Vice versa, many time series (real-life dataset) data can be modeled by AR(1).
+
+- When we try to fit the model to the data, we need to find the parameters $\beta_0$ and $\beta_1$ that best fit the data. 
+
+---
+# Parameter Estimation
+
+-   AR(1) is very similar to linear model where $y_{t-1}$ play the roles of the predictor and $y_{t}$ is the response
+
+-   In linear model, the predictor $x$ is assumed to be non-random while the predictor $y_{t-1}$ is non-random in AR(1)
+
+-   Given a time series dataset of $y_t$, we estimate $\beta_0$ and $\beta_1$ to best fit the dataset by minimizing
+
+$$\sum_{t=2}^T\bigg(y_t-E(y_t|y_{t-1})\bigg)^2 = \sum_{t=2}^T\bigg(y_t-\beta_0-\beta_1y_{t-1}\bigg)^2$$
+
+-   These estimators are called the conditional least squares estimators
+
+---
+# Parameter Estimation
+
+The coefficients are estimated by 
+
+$$\hat{\beta}_1 = \frac{\sum_{t=2}^T(y_{t-1}-\bar{y})(y_t-\bar{y})}{\sum^T_{t=2}(y_t-\bar{y})^2}\\
+    \hat{\beta}_0 = \bar{y}(1-\hat{\beta_1})$$
+
+The only parameter left to estimate is the error variance, $\sigma^2_{\epsilon}$, (error mean is zero), which can be estimated by $s^2$ 
+
+$$s^2 = \frac{\sum_{t=2}^T(e_t-\bar{e})^2}{T-3}$$
+
+where $e_t = y_t - (\hat{\beta}_0-\hat{\beta}_1y_{t-1})$.
+
+---
+# Problem 1
+
+You are given the following six observed values of the autoregressive model of order one time series
+
+$$y_t = \beta_0 + \beta_1 y_{t-1} + \epsilon_t, \text{ with   }  Var(\epsilon_t) = \sigma^2.$$
+
+```{r, echo=FALSE}
+library(knitr)
+y =  c(14, 5, 11, 4, 11, 3)
+t = length(y)
+y_bar = mean(y)
+
+u = y[-t]-y_bar
+v = (y-y_bar)[2:t]
+
+b1 = sum(u*v)/sum(u^2)
+b0 = y_bar*(1-b1)  
+
+df = data.frame(t = c(1:6), y = y)
+kable(df)
+```
+
+
+Calculate $\hat{\beta}_1$ using the conditional least squares method.
+
+
+---
+# Solution
+
+We have
+
+$\bar{y} = \frac{14 + 5+ 11+ 4+ 11+ 3}{6} = 8$
+
+| t |  y | $y - \bar{y}$ |
+|--:|---:|------:|
+| 1 | 14 |     6 |
+| 2 |  5 |    -3 |
+| 3 | 11 |     3 |
+| 4 |  4 |    -4 |
+| 5 | 11 |     3 |
+| 6 |  3 |    -5 |
+
+
+We have
+
+$\beta_1 = \frac{6(-3)+(-3)3+3(-4)+(-4)3 + 3(-5)}{6^2 +(-3)^2+3^2+(-4)^2+3^2} = \frac{-66}{79} = -0.8354$
+
+
+---
+class: center, middle, inverse
+# Prediction
+
+---
+# Prediction
+
+- Once we estimated $\beta_0$ and $\beta_1$, we have a fitted model and can use the model to make prediction. 
+
+- The prediction formula should be straight forward from the model equation
+
+$$\hat{y}_{t+1} = \beta_0 + \beta_1y_t$$
+$$\hat{y}_{t+2} = \beta_0 + \beta_1\hat{y}_{t+1}$$
+and so on.
+
+- Explicitly, 
+
+$$
+\hat{y}_{t+k} = \frac{\beta_0(1-\beta^k_1)}{1-\beta_1} + \beta^k_1y_t
+$$
+
+---
+# Problem 2
+
+You are given the following six observed values of the autoregressive model of order one time series
+
+$$y_t = \beta_0 + \beta_1 y_{t-1} + \epsilon_t, \text{ with   }  Var(\epsilon_t) = \sigma^2.$$
+
+```{r, echo=FALSE}
+library(knitr)
+y =  c(14, 5, 11, 4, 11, 3)
+t = length(y)
+y_bar = mean(y)
+
+u = y[-t]-y_bar
+v = (y-y_bar)[2:t]
+
+b1 = sum(u*v)/sum(u^2)
+b0 = y_bar*(1-b1)  
+
+df = data.frame(t = c(1:6), y = y)
+kable(df)
+```
+
+
+Estimated $y_{10}$
+
+---
+# Solution
+
+This is the same series as in Problem 1.  We first estimate $\beta_0$ as follows. 
+
+$$\beta_0 = \bar{y}(1-\hat{\beta_1}) = 8(1--0.835443) = 14.68$$
+
+Since the last value of $t$ is $t=6$, we have the estimated value of $y_{10}$ is 
+
+$\hat{y}_{10} = \hat{y}_{6+4} = \frac{\beta_0(1-\beta^4_1)}{1-\beta_1} + \beta^4_1y_6 = 5.56$
+
+---
+class: inverse, center, middle
+# AR(p)
+
+---
+# AR(p)
+
+Ar(p) is a natural extension of AR(1).  We define AR(2) as the model below. 
+
+$$y_t = \beta_0 + \beta_1 y_{t-1} + \beta_2 y_{t-2} + \epsilon_t$$
+
+and similarly, AR(p) is defined by the below equation. 
+
+$$y_t = \beta_0 + \beta_1 y_{t-1} + \beta_2 y_{t-2} +...+ \beta_p y_{t-p} + \epsilon_t$$
+
+- There are condition on the coefficients so that the series is stationary. We do not mention the condition here. 
+
+---
+# Simulation
+
+- AR(2)
+
+```{r}
+y <- arima.sim(list(order=c(2,0,0), ar=c(-.7, -.6)), n = 100)
+plot(y)
+```
+
+---
+# Simulation
+
+```{r}
+acf(y)
+```
+
+
+---
+# Simulation
+
+- AR(4)
+
+```{r}
+y <- arima.sim(list(order=c(4,0,0), ar=c(-.7, -.6, -.1, .1)), n = 100)
+plot(y)
+```
+
+---
+# Simulation
+
+- AR(4)
+
+```{r}
+acf(y)
+```
+
+
+---
+class: inverse, center, middle
+# Autoregression in R
+
+---
+# Autoregression in R
+
+- We already know how to simulate AR models in R. Now we will look at how we can fit a model to a time series in R.
+
+- To demonstrate this we first generate/simulate an AR(1) series and then use R to fit the generated data.  Our goal is to see how good the estimation is or how well the model fit the data? (It should be a good fit since we already know that the data is generated from an AR model)
+
+---
+
+We will generate the data for the following series
+
+$$y = 10 + .7 y_{t-1} + \epsilon$$
+
+where $\epsilon \sim N(0, 1)$
+
+---
+
+```{r}
+y <- arima.sim(list(order=c(1,0,0), ar=c(.7)), n = 1000)
+b0 = 10
+y <- y + b0
+plot(y)
+```
+
+---
+
+```{r}
+arima(y, order = c(1,0,0))
+```
+- We observe that the estimated value of $\beta_1$ is 0.7134 which is very close to the true value of $\beta_1$ that used to generate the series (which is .7). 
+
+---
+# Plot the fitted series
+
+- We can plot the fitted series and the original series to compare
+
+```{r}
+# estimate the series using AR(1) model
+y_ar  = arima(y, order = c(1,0,0))
+# plot the estimated series and the original series
+y_predicted <- y - y_ar$residuals
+plot(y)
+points(y_predicted, type = "l", 
+       col = "red", lty = 2)
+```
+
+---
+# Forecasting with AR(1)
+
+- We can use the `forecast` function to calculate the forecas by the model
+
+```{r}
+ts_forecasts <- forecast(y_ar)
+plot(ts_forecasts)
+```
+
+
+---
+class: center, middle, inverse
+# With Real-life Data
+
+---
+# Example 1
+
+- Consider the series of annual earthquakes in the world with seismic magnitude greater than 7. 
+
+- We first import and plot the series
+
+[Dataset](quakes.csv)
+
+```{r}
+df = read.csv('quakes.csv')
+y = ts(df$quakes, frequency = 1)
+plot(y)
+```
+
+---
+# Example 1
+
+- To be able to fit the autoregressive model to the data, the data needs to be stationary.  The plot does show that the series does not look like it has trend. 
+
+```{r}
+acf(y)
+```
+
+- We notice that the ACF does die out to zero as the lag increase. 
+
+- Thus, we could consider to fit the autoregressive model to the series. 
+
+---
+
+```{r}
+arima(y, order = c(1,0,0))
+```
+
+---
+# Example 2
+
+Consider the series of Apple stock in 2024.  We will use the `quantmod` package to import the series. 
+
+```{r}
+library(quantmod)
+library(forecast)
+getSymbols("AAPL")
+
+```
+
+---
+# Example 2
+
+```{r}
+y = AAPL$AAPL.Open
+y <- y[index(y) > "2024-01-01"]
+plot(y)
+```
+
+---
+# Example 2
+
+- Can we fit an autoregressive model to this series? 
+
+- We immediately observe that the series does have trend.  Thus, it is not stationary. 
+
+- We can plot its ACF to further confirm this. 
+
+---
+# Example 2
+
+```{r}
+acf(y)
+```
+
+- The ACF does not seem to die out exponentially when the lag increases. 
+
+- Since the series is not stationary, an autoregressive model may not be a good fit for the data. 
+
+---
+class: center, middle, inverse
+
+# Differencing technique
+
+---
+# Differencing technique
+
+- If the series $y_t$ is not stationary, we can try to de-trend the series to hopefully transform it to a stationary series. 
+
+- We create the differenced series as follows. 
+
+$$d_t = y_t - y_{t-1}$$
+
+- The differenced series $d_t$ then can potentially stationary and can be modeled by the AR(1) model for forecasting
+
+- This is sometime can be called the differencing technique. 
+
+
+---
+# Differencing technique
+
+Forecasting using differencing technique can be done as follows. 
+
+- Step 1: Create the differenced series $d_t = y_t - y_{t-1}$
+
+- Step 2: Check the plot of $d_t$ and its ACF for stationarity
+
+- Step 3: If $d_t$ appears to be stationary, fit an autoregressive model on $d_t$
+
+- Step 4: Use the fitted model to make a forecast on $d_{t+1}$
+
+- Step 5: From the forecast $d_t$ calculate the associated $y_{t+1} = y_{t}+d_t$. 
+
+---
+# Example 3
+
+We will apply the differencing technique on the AAPL stock series.
+
+```{r}
+library(quantmod)
+library(forecast)
+getSymbols("AAPL")
+y = AAPL$AAPL.Open
+y <- y[index(y) > "2023-01-01"]
+```
+
+---
+
+- We use the `diff` function to create the differenced series for the Apple stock series. 
+
+```{r}
+d = diff(y)[-1]
+plot(d)
+```
+
+- We observe that the differenced series does not trend. 
+
+---
+
+```{r}
+acf(d, lag.max = 100)
+```
+
+
+- The ACF plot shows that the difference series is stationary and can be model by an AR model.
+
+---
+The ACF plot shows that the difference series is stationary and can be model by an AR model.
+
+```{r}
+ar_AAPL = arima(d, order = c(1,0,0))
+ar_AAPL
+```
+
+---
+- Forecast the next observation of $d_n$. 
+
+```{r}
+d_n = forecast(ar_AAPL, h = 1)
+```
+
+- Notice that $y_{n+1} = y_n + d_n$, we can forecast $y_{n+1}$ using $y_n$ and $d_n$
+
+```{r, warning=FALSE}
+y_next = d_n$mean + y[length(y)]
+y_next = as.numeric(y_next)
+y_next
+```
+
+

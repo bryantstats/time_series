@@ -1,0 +1,78 @@
+---
+title: "R - Assignment 7"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+### Instruction
+
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
+
+2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+4.  *Submit the pdf/Word to Canvas.*
+
+------------------------------------------------------------------------
+
+Use the sample codes from the class slides to complete this Assignment
+
+[Class Slides](note7.html)
+
+## Question 1 
+
+Given an MA(1) series as follows. (Notice this series is the same as the series in Problem 1 in the AYU)
+
+$$y_t = 2024 + .4 \epsilon_{t-1} + \epsilon,$$
+
+where $\epsilon \sim (0, 1)$
+
+- Calculate $E(y_t)$, $V(y_t)$ and the autocorrelation at lag 1. 
+
+- Simulate and plot the series.
+
+- Calculate the sample values of the mean, the variance and the ACF at lag 1 to verify the theoretical properties of MA(1)
+
+## Question 2 
+
+Given an MA(2) series as follows. (Notice this series is the same as the series in Problem 2 in the AYU)
+
+$$y_t = 2024 + .4 \epsilon_{t-1} +.1 \epsilon_{t-2} + \epsilon$$
+
+where $\epsilon \sim (0, 1)$
+
+- Simulate and plot the series.
+
+- Calculate the sample values of the mean, the variance and the ACF at lag 1 to verify the theoretical properties of MA(1)
+
+## Question 3
+
+- Simulate an ARMA(2, 1). 
+
+- Plot its ACF and PACF. 
+
+## Question 4
+
+Consider the below dataset. 
+
+Dataset: Percentage changes in quarterly personal consumption expenditure, personal disposable income, production, savings and the unemployment rate for the US, 1970 to 2016.
+
+[Dataset](uschange.csv)
+
+```{r, eval=FALSE, echo=FALSE}
+library(forecast)
+library(ggplot2)
+# read the data
+uschange =  read.csv('uschange.csv')
+# turn the data to a series
+# notice frequency = 4 because this is a quarterly data
+uschange = ts(uschange, start = 1970, frequency = 4)
+yt = uschange[,c("Consumption")] 
+```
+
+Let $y_t$ be the series of `Consumption` in the dataset. Assume that the series is stationary. Fit an ARMA model to $y_t$. Explain your selection of the orders in ARMA. Use the fitted model to plot a forecast for the series. 
+
+------------------------------------------------------------------------

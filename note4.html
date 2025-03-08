@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Time Series Regression Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" Son Nguyen " />
+    <script src="libs/header-attrs-2.26/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Time Series Regression Models
+]
+.author[
+### <font size="5"> Son Nguyen </font>
+]
+
+---
+
+
+&lt;style&gt;
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide &gt; h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide &gt; h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide &gt; h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+&lt;/style&gt;
+
+
+
+
+# Introduction
+
+- A time series `\(y_t\)` can be forecast using its past values `\(y_{t-1}, y_{t-2}...\)`
+
+- In exponential smoothing models, we use the past values of `\(y_t\)` to make forecast for the future values. 
+
+- A time series `\(y_t\)`  can also be forecast using another time series `\(x_t\)`
+
+- If we assume that `\(y_t\)` is a linear function of `\(x_t\)` we will have an (linear) regression time series model. 
+
+- We will study this model this week. 
+
+
+---
+class: inverse, middle, center
+# Simple Linear Regression
+
+---
+# Simple Linear Regression
+
+- Suppose we want to linearly regress `\(y_t\)` on `\(x_t\)`. The model equation is
+
+$$
+y_t = \beta_0 + \beta_1 x_t + \epsilon_t
+$$
+
+- The series `\(x_t\)` is called a predictor series. 
+
+- The model has two parameters `\(\beta_0\)` and `\(\beta_1\)`
+
+- `\(x_t\)` could be the `\(y_{t-k}\)`, which is a lagged version of `\(y_t\)`.  This would make the model `autoregressive model` where it regresses on itself.  We will study these models later on in the class.  
+
+- `\(x_t\)` could be another series or it could be a function of the time `\(t\)`
+
+- For stationary series, `\(x_t\)` is usually another time series
+
+- For non-stationary series (with trend or seasonality), `\(x_t\)` is usually a function of the time `\(t\)` (we will see this later on in the slides)
+
+---
+# Least squares estimation
+
+-  Similar to linear regression in statistics, the coefficients `\(\beta_0\)` and `\(\beta_1\)` are computed to minimize the sum squares errors
+
+`$$SSE = \sum_{t=1}^T(y_t - \hat{y_t})^2 =  \sum_{t=1}^T(y_t - \beta_0 - \beta_1 x_t)^2$$`
+
+- Also notice that the least squared method is not the only way to estimate the parameters.  Another way could be the [absolute least method](https://en.wikipedia.org/wiki/Least_absolute_deviations)
+
+---
+# Example
+
+- Dataset: Percentage changes in quarterly personal consumption expenditure, personal disposable income, production, savings and the unemployment rate for the US, 1970 to 2016. 
+
+[Download](uschange.csv)
+
+
+```r
+library(forecast)
+library(ggplot2)
+# read the data
+uschange =  read.csv('uschange.csv')
+
+# turn the data to a series
+# notice frequency = 4 because this is a quarterly data
+uschange = ts(uschange, start = 1970, frequency = 4)
+```
+
+---
+# Example
+
+
+```r
+plot(uschange)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+- From the plot, we observe that this dataset has four five time series data.  
+
+- We will set our response variable to be `Consumption` and the predictor to be `Income`
+
+
+---
+- Plot the response and the predictor
+
+
+```r
+# set up the two series
+yt = uschange[,c("Consumption")] 
+xt =  uschange[,c("Income")] 
+  
+qplot(xt, yt)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+- Plot the response and the predictor along the time
+
+
+```r
+plot(yt)
+lines(xt, col = 'red')
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+- We use the function `tslm` to fit the model
+
+
+```r
+model = tslm(yt ~ xt)
+model
+```
+
+```
+## 
+## Call:
+## tslm(formula = yt ~ xt)
+## 
+## Coefficients:
+## (Intercept)           xt  
+##      0.5451       0.2806
+```
+- From the result, we have the equation of the fitted model
+
+`$$\text{Consumption}  = 0.5451 + 0.2806 \cdot \text{Income}$$`
+
+---
+class: inverse, middle, center
+
+# Model Evaluation
+
+
+---
+# Model Evaluation
+
+- How good is the model, or how well the model fit the data?
+
+There are multiple ways to evaluate how good the linear regression is.  We focus on the following ways.
+
+- (1) `\(R^2\)`
+
+- (2) The plot between the fitted values produced by the model and the true values of the response. 
+
+- (3) The plot of the residual
+
+---
+# R Squared
+
+`$$R^2 = 1 -  \frac{\sum (y_t - \hat{y}_t)^2}{\sum (y_t - \bar{y})^2}$$`
+
+- The `\(R^2\)` compares the regression model with the baseline model where `\(y_t = \bar{y}\)`.  
+
+- `\(R^2 = 0\)` means the regression model is as good as the baseline model, hence, it is not a good fit (the linear model does not fit the data well.  There is a non-linear relationship between the response and the predictors). 
+
+- The greater the `\(R^2\)` the better the fit. The maximum is when `\(R^2 = 1\)`.  This is when we have a perfect fit: the response and the predictor have a perfect linear relationship. 
+
+---
+# Example
+
+- Let see the `\(R^2\)` of the model in the previous example. 
+
+
+```r
+summary(model)
+```
+
+```
+## 
+## Call:
+## tslm(formula = yt ~ xt)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.40845 -0.31816  0.02558  0.29978  1.45157 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.54510    0.05569   9.789  &lt; 2e-16 ***
+## xt           0.28060    0.04744   5.915 1.58e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.6026 on 185 degrees of freedom
+## Multiple R-squared:  0.159,	Adjusted R-squared:  0.1545 
+## F-statistic: 34.98 on 1 and 185 DF,  p-value: 1.577e-08
+```
+
+- We see that the R-Squared is 0.159.  This indicates that the regression model is not a very good fit. 
+
+
+---
+# Model Evaluation 
+
+- Another way to look at how good the model is is to plot (scatter plot) the fitted values and the response values in the same coordinate. 
+
+- A good fit will produce points that along the line `\(y = x\)`.  The closer the points from the line, the better the fit. 
+
+---
+# Example
+
+- Let plot the scatter plot between the fitted values and the response in the previous example.  To make the codes easier to read, we create a function `fit_plot` to do that.  The function inputs the fitted model and output the plot. 
+
+
+
+```r
+fit_plot = function(m)
+{
+library(tidyverse)
+library(ggplot2)
+  
+true_value = m$x
+fitted_value = fitted(m)
+
+limit = c(min(true_value), max(true_value))
+# Plot
+cbind(true_value, fitted_value)%&gt;%
+  as.data.frame() %&gt;% 
+  ggplot(aes(x=true_value, y=fitted_value)) +
+  geom_point() +
+  geom_abline(intercept=0, slope=1, color = 'red')+
+  coord_cartesian(xlim = limit, 
+                  ylim = limit) 
+}
+```
+
+
+
+
+
+
+---
+# Model Evaluation
+
+- Now let plot the scatter plot between the fitted values and the response in the previous example. 
+
+
+```r
+model &lt;- tslm(yt ~ xt)
+```
+
+
+---
+# Model Evaluation
+
+- Now let plot the scatter plot between the fitted values and the response in the previous example. 
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+- The points not standing very close to the red line ( `\(y=x\)` ) indicates a poor fit. 
+
+---
+# Model Evaluation
+
+- A residual is the difference between the response values and the fitted values or `\((\hat{y}_t- y_t)\)`
+
+- We could look at the autocorrelation (ACF) of the residuals model to judge how well the model fit the data
+
+- Residuals of a good fit should be a normal white-noise.  Thus, the ACF should stays within the blue strip and the histogram should be normally distributed around 0
+
+
+---
+# Model Evaluation
+
+- Let's take a look at the plot related to the residuals of the model in the previous example
+
+
+```r
+checkresiduals(model)
+```
+
+
+---
+# Model Evaluation
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+```
+## 
+## 	Breusch-Godfrey test for serial correlation of order up to 8
+## 
+## data:  Residuals from Linear regression model
+## LM test = 27.422, df = 8, p-value = 0.0005977
+```
+
+- We observe that although it is not very clear, the first few values of the ACF are outside of the blue strip, indicating that the residual series may not be a white noise. 
+
+---
+# Model Evaluation
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+```
+## 
+## 	Breusch-Godfrey test for serial correlation of order up to 8
+## 
+## data:  Residuals from Linear regression model
+## LM test = 27.422, df = 8, p-value = 0.0005977
+```
+
+- We also see that the histogram of the residuals looks normally distributed from 0.  Thus, the residuals analysis should be used along with other model evaluation methods ( `\(R^2\)` and the fitted values plot)
+
+---
+class: inverse, middle, center
+# Series with Trend
+
+---
+# Series with Trend
+
+- If two series `\(a_t\)` and `\(b_t\)` have a linear trend, then both `\(a_t\)` and `\(b_t\)` will be a linear function of the time `\(t\)`.
+
+- Thus, `\(a_t\)` and `\(b_t\)` will have a linear relationship and the linear model fit `\(a_t\)` and `\(b_t\)` should always be a good fit even though in the case the two series may be very strange with each other. 
+
+---
+# Example
+
+- Dataset: Total annual air passengers (in millions) including domestic and international aircraft passengers of air carriers registered in Australia. 1970-2016.
+
+[Download](aus_airpassengers.csv)
+
+
+```r
+a_t = read.csv('aus_airpassengers.csv')
+
+# frequency = 1 because this is a annual data
+# the year start from 1970
+a_t = ts(a_t, start = 1970, frequency = 1)
+plot(a_t)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+- We observe that this series has a trend
+
+---
+# Example
+
+Dataset: Total annual rice production (million metric tons) for Guinea. 1970-2011.
+
+[Download](guinea_rice.csv)
+
+
+```r
+b_t = read.csv('guinea_rice.csv')
+# frequency = 1 because this is a annual data
+# the year start from 1970
+b_t = ts(a_t, start = 1970, frequency = 1)
+plot(b_t)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+- We observe that this series has a trend
+
+---
+# Example
+
+- Let's regress Total annual air passengers on the Total annual rice production
+
+
+```r
+model = tslm(a_t ~ b_t)
+summary(model)
+```
+
+```
+## 
+## Call:
+## tslm(formula = a_t ~ b_t)
+## 
+## Residuals:
+##        Min         1Q     Median         3Q        Max 
+## -1.678e-15 -4.936e-16 -1.299e-16  1.766e-16  6.315e-15 
+## 
+## Coefficients:
+##              Estimate Std. Error   t value Pr(&gt;|t|)    
+## (Intercept) 8.291e-15  3.376e-16 2.456e+01   &lt;2e-16 ***
+## b_t         1.000e+00  9.366e-18 1.068e+17   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.272e-15 on 45 degrees of freedom
+## Multiple R-squared:      1,	Adjusted R-squared:      1 
+## F-statistic: 1.14e+34 on 1 and 45 DF,  p-value: &lt; 2.2e-16
+```
+
+- We notice that the `\(R^2 = 1\)` indicating a perfect fit!
+
+- However, air passenger traffic in Australia has nothing to do with rice production in Guinea
+
+- This is called Spurious Regression!
+
+---
+# Example
+
+
+```r
+fit_plot(model)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+- All the points lie on the line `\(y = x\)` (red line) indicates that the model fits the data almost perfectly. 
+
+---
+class: middle, center, inverse
+# Time predictors
+
+---
+# Time predictors
+
+
+- When we think that a series has a linear trend, we could apply linear regression where the predictor is the time variable
+
+$$
+y_t =  \beta_0 + \beta_1t
+$$
+- The series is a linear function of the time `\(t\)`
+
+---
+# Time predictors
+
+Let fit the Total annual air passengers on the time `\(t\)`
+
+
+```r
+model &lt;- tslm(a_t ~ trend)
+summary(model)
+```
+
+```
+## 
+## Call:
+## tslm(formula = a_t ~ trend)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -9.422 -4.582 -2.176  6.434 10.435 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -3.33603    1.78943  -1.864   0.0688 .  
+## trend        1.39360    0.06491  21.470   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 6.036 on 45 degrees of freedom
+## Multiple R-squared:  0.9111,	Adjusted R-squared:  0.9091 
+## F-statistic:   461 on 1 and 45 DF,  p-value: &lt; 2.2e-16
+```
+
+- We notice the very high `\(R^2\)` value indicate a good fit.
+
+---
+
+
+```r
+fit_plot(model)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+- The points standing very close to the red line indicates a good fit. 
+
+
+
+---
+class: inverse, center, middle
+# Multiple linear regression
+
+---
+# Multiple linear regression
+
+
+-  If there are more than one predictors, we will have multiple (linear) regression
+
+`$$y_t = \beta_0 + \beta_1 x_{1,t} +...+ \beta_k x_{k,t} + \epsilon_t$$`
+
+---
+# Example
+
+Let comeback to the first series
+
+
+```r
+uschange =  read.csv('uschange.csv')
+
+# turn the data to a series
+# notice frequency = 4 because this is a quarterly data
+uschange = ts(uschange, start = 1970, frequency = 4)
+
+model = tslm(Consumption ~ Income + Savings, data=uschange)
+```
+
+---
+# Example
+
+
+```r
+summary(model)
+```
+
+```
+## 
+## Call:
+## tslm(formula = Consumption ~ Income + Savings, data = uschange)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.02827 -0.15851 -0.01347  0.13629  1.48817 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.222697   0.036372   6.123 5.43e-09 ***
+## Income       0.817142   0.039219  20.835  &lt; 2e-16 ***
+## Savings     -0.051238   0.002673 -19.172  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.349 on 184 degrees of freedom
+## Multiple R-squared:  0.7194,	Adjusted R-squared:  0.7164 
+## F-statistic: 235.9 on 2 and 184 DF,  p-value: &lt; 2.2e-16
+```
+
+- We observe that `Income` has a positive effect on `Consumption` while and `Savings` has a negative effect on `Consumption`.
+
+---
+# Example
+
+
+
+```r
+fit_plot(model)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+- The points standing very close to the red line indicates a good fit. 
+
+
+---
+class: middle, center, inverse
+# Series with Seasonality
+
+---
+# Series with Seasonality
+
+
+- If the series has seasonality, we could use multiple regression where the predictors are indicator variables.
+
+- For example: Suppose we have a quarterly series `\(y_t\)` where we think the series has a seasonal component only. We can regress `\(y_t\)` on a categorical time variable `\(t\)`. 
+
+- Here `\(t = 1, 2, 3, 4\)` is the time variable: `\(t=1\)` for quarter 1, `\(t=2\)` for quarter 2, and so on
+
+- Since `\(t\)` is categorical variable, we need to convert it to numeric variables to for the machine to interpret. 
+
+- The conversion of `\(t\)` into three (not four) binary variables `\(I_1, I_2, I_3\)`.   works as follows. 
+
+| Quarter ( `\(t\)`) | `\(I_2\)` | `\(I_3\)` | `\(I_4\)` |
+|---------|----|----|----|
+| 1       | 0  | 0  | 0  |
+| 2       | 1  | 0  | 0  |
+| 3       | 0  | 1  | 0  |
+| 4       | 0  | 0  | 1  |
+
+- `\(I_2 = 1\)` means the time is at quarter 2 and `\(I_2 = 0\)` means the time is not at quarter 2. The combination values of `\(I_2, I_3, I_4\)` will specify the quarter. 
+
+---
+# Series with Seasonality
+
+- Thus, we can establish the linear model as follows. 
+
+`$$y_t =  \beta_0 + \beta_2 I_2+ \beta_3 I_3+ \beta_4 I_4$$`
+
+- Notice that we do not use the notation of `\(\beta_1\)` here for mathematical convenience. 
+
+- Notice also that to model a quarterly seasonality component one would need four parameters. 
+
+---
+# Example
+
+- Let study the series of total quarterly beer production in Australia (in megalitres) from 1992:Q1 to 2010:Q2.
+
+[Dataset](beer.csv)
+
+
+```r
+y = read.csv('beer.csv')
+y = ts(y, start = c(1992, 1), frequency = 4)
+```
+
+---
+# Example
+
+
+```r
+plot(y)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+
+- The series plot indicates that the series has a seasonal component. 
+
+---
+# Example
+
+- We train a linear regression with a quarterly time predictor. 
+
+
+```r
+model &lt;- tslm(y ~ season)
+model
+```
+
+```
+## 
+## Call:
+## tslm(formula = y ~ season)
+## 
+## Coefficients:
+## (Intercept)      season2      season3      season4  
+##      429.21       -35.00       -17.82        72.46
+```
+
+- The model has four parameters as shown above. 
+
+---
+
+
+```r
+summary(model)
+```
+
+```
+## 
+## Call:
+## tslm(formula = y ~ season)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -47.667 -10.417  -0.300   8.745  30.333 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  429.211      3.271 131.234  &lt; 2e-16 ***
+## season2      -35.000      4.625  -7.567 1.14e-10 ***
+## season3      -17.822      4.689  -3.801 0.000305 ***
+## season4       72.456      4.689  15.452  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 14.26 on 70 degrees of freedom
+## Multiple R-squared:  0.8957,	Adjusted R-squared:  0.8912 
+## F-statistic: 200.3 on 3 and 70 DF,  p-value: &lt; 2.2e-16
+```
+
+- We see that this model fit the data pretty well because of a high `\(R^2\)`.
+
+---
+class: middle, center, inverse
+# Series with Trend and Seasonality
+
+---
+# Series with Trend and Seasonality
+
+If we believe there is the series has a trend component, we can also include both trend and seasonality into the linear regression as follows. 
+
+$$
+y_t =  \beta_0 + \beta_1 t +  \beta_2 I_2+ \beta_3 I_3+ \beta_4 I_4
+$$
+
+This model will have five parameters. 
+
+---
+# Series with Trend and Seasonality
+
+
+```r
+y = read.csv('beer.csv')
+y = ts(y, start = c(1992, 1), frequency = 4)
+model &lt;- tslm(y ~ trend + season)
+summary(model)
+```
+
+```
+## 
+## Call:
+## tslm(formula = y ~ trend + season)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -42.903  -7.599  -0.459   7.991  21.789 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 441.80044    3.73353 118.333  &lt; 2e-16 ***
+## trend        -0.34027    0.06657  -5.111 2.73e-06 ***
+## season2     -34.65973    3.96832  -8.734 9.10e-13 ***
+## season3     -17.82164    4.02249  -4.430 3.45e-05 ***
+## season4      72.79641    4.02305  18.095  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 12.23 on 69 degrees of freedom
+## Multiple R-squared:  0.9243,	Adjusted R-squared:  0.9199 
+## F-statistic: 210.7 on 4 and 69 DF,  p-value: &lt; 2.2e-16
+```
+
+
+---
+# Series with Trend and Seasonality
+
+
+```r
+fit_plot(model)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /&gt;
+
+- The points standing very close to the red line indicates a good fit. 
+
+- We also observe that adding the trend component makes a better model. 
+
+
+---
+#  What linear model to choose?
+
+Suppose we want to use linear regression to model a time series. Here are some recommendation on what linear model to use: 
+
+- For stationary series (no trend and no seasonality), consider to use other series as the predictors of the regression or `model &lt;- tslm(y ~ x1 + x2+...`
+
+- For non-stationary series with trend, consider to use the time as the continuous predictor: `model &lt;- tslm(y ~ trend)`
+
+- For non-stationary series with seasonality, consider to use the time as the categorical predictor: `model &lt;- tslm(y ~ season)`
+
+- For non-stationary series with both trend and seasonality, consider to use the time as the continous predictor and categorical predictor `model &lt;- tslm(y ~ trend + season)`
+
+
+
+---
+class: middle, inverse, center
+
+# Forecasting 
+
+
+---
+# Forecasting 
+
+- Suppose we regress `\(y_t\)` on predictor `\(x_t\)`.  
+
+- To make a forecast for `\(y_t\)` we need to provide the model with the value of `\(x_t\)`.  
+
+- Since the value of `\(x_t\)` may not be available at the time of forecasting, we also need to make a forecast for `\(x_t\)` first.
+
+---
+# Forecasting 
+
+The forecasting for `\(y_t\)` needs two steps
+
+- (1)  Forecast the value of the predictor `\(x_t\)`
+- (2)  Using the regression model to forecast the value of `\(y_t\)`
+
+The quality of forecasting `\(y_t\)` depends on the both steps
+
+A good fit model may not produce a good forecast due to the poor forecast of the predictor. 
+
+
+---
+# Example
+
+
+```r
+# fit the model
+model &lt;- tslm(Consumption ~ Income, data = uschange)
+
+# Set future values of the predictor Income by the average
+newdata = data.frame(
+    Income = rep(mean(uschange[,"Income"]), 10))
+
+# use the forecast predictor to forecast response
+my_forecast &lt;- forecast(model,
+    newdata = newdata)
+
+plot(my_forecast)
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+- Since the forecast of predictors are the same in the next five periods, the forecast of the response also the same (constant) in the next 5 periods.
+
+
+---
+class: middle, center, inverse
+# Series with Trend and Seasonality
+
+---
+# Series with Trend or Seasonality
+
+- For model train with the time predictor and the seasonal predictor,  we do not need to provide the model with the values the predictor. 
+
+---
+# Example 
+
+- We will fit a regression model with a continuous time predictor and categorical time predictor. 
+
+
+```r
+y = read.csv('beer.csv')
+y = ts(y, start = c(1992, 1), frequency = 4)
+
+# fit the model
+model &lt;- tslm(y ~ trend + season)
+```
+
+
+---
+# Example 
+
+- Make and plot forecast
+
+
+
+```r
+# make forecast
+fcast &lt;- forecast(model)
+
+# plot forecast
+autoplot(fcast) +
+  ggtitle("Forecasts of beer production using regression") +
+  xlab("Year") + ylab("megalitres")
+```
+
+&lt;img src="note4_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

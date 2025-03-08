@@ -1,0 +1,36 @@
+---
+title: "R - Assignment 8"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+### Instruction
+
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
+
+2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+4.  *Submit the pdf/Word to Canvas.*
+
+------------------------------------------------------------------------
+
+Use the sample codes from the class slides to complete this Assignment
+
+[Class Slides](note8.html)
+
+## Question 1 
+
+- Find a non-seasonal series then apply the two approaches discussed in the slides to fit the ARIMA model to the series. Make forecast using the fitted model. 
+
+## Question 2
+
+- Find a seasonal series then apply the `auto.arima` function to fit the ARIMA model to the series. Make forecast using the fitted model. 
+
+
+
+
+------------------------------------------------------------------------

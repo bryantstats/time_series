@@ -1,0 +1,179 @@
+---
+title: "AYU - Individual Week 4"
+format: 
+  html:
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Instruction**: *Scan your answer into pdf/word document then submit to Canvas.*
+
+## Problem 1
+
+Which statement are/is true?
+
+a.  To make a forecast for $y_t$, the Exponential Smoothing Models may use another time series other than $y_t$.
+
+b.  To make a forecast for $y_t$, the Regression Models may use another time series other than $y_t$.
+
+c.  To make a forecast for $y_t$, the Regression Models may not use another time series other than $y_t$.
+
+d.  In Linear Regression the least squared method is the only method to estimate the parameters of the equation.
+
+## Problem 2
+
+Which statement are/is true?
+
+a.  In regression model, $R^2$ could be negative indicating that the model is worse than the baseline model
+
+b.  In regression model, $R^2$ cannot be 1 because there is no perfect model.
+
+c.  The $R^2$ of the baseline model is 0.
+
+## Problem 3
+
+Which statement are/is true?
+
+a.  The scatter plot of the fitted values and the response values of should lie on the line $y=x$ for any model
+
+b.  The scatter plot of the fitted values and the response values of should not lie on the line $y=x$ for any model
+
+c.  The scatter plot of the fitted values and the response values of should lie on the line $y=x$ for a well fitted model
+
+d.  The scatter plot of the fitted values and the response values of should lie on the line $y=x$ for a poor fitted model
+
+## Problem 4
+
+Which statement are/is true?
+
+a.  The residuals of any regression model should be a normal white-noise
+
+b.  The residuals of a well fitted regression model should be a normal white-noise
+
+c.  The residuals of a poorly fitted regression model should be a normal white-noise
+
+## Problem 5
+
+Which of the following series should use the time as the predictor (there could be more than one series)
+
+a.  
+
+```{r}
+set.seed(2024)
+y = ts(rnorm(100))
+plot(y)
+```
+
+b.  
+
+```{r}
+set.seed(2024)
+y = ts(-2*c(1:100) + rnorm(100, sd = 3))
+plot(y)
+```
+
+c.  
+
+```{r}
+set.seed(2024)
+y = ts(c(1:100)+ rnorm(100, sd = 3))
+plot(y)
+```
+
+## Problem 5
+
+Which of the following series should use the time as the predictor (there could be more than one series)?
+
+a.  
+
+```{r}
+set.seed(2024)
+y = ts(5*cos(50*c(1:100))+ rnorm(100, sd = .3))
+plot(y)
+```
+
+b
+
+```{r}
+set.seed(2024)
+y = ts(3*c(1:100)+ 50*cos(50*c(1:100))+ rnorm(100, sd = .3))
+plot(y)
+```
+
+c.  
+
+```{r}
+set.seed(2024)
+y = ts(rnorm(100, sd = .3))
+plot(y)
+```
+
+## Problem 6
+
+Which statement are/is true?
+
+a.  Linear Regression cannot be used to model series with trend
+
+b.  Linear Regression cannot be used to model series with seasonality
+
+c.  Linear Regression cannot be used to model series with trend and seasonality
+
+## Problem 7
+
+How many parameters a Simple Linear Regression has?
+
+a.  1
+
+b.  2
+
+c.  More than 2
+
+d.  Could be any number from 1, 2,...
+
+## Problem 8
+
+How many parameters a Multiple Linear Regression has?
+
+a.  1
+
+b.  2
+
+c.  More than 2
+
+d.  Could be any number from 1, 2,...
+
+## Problem 9
+
+Suppose you want to use the time predictor to model a quarterly seasonal time series. How many parameters the equation have?
+
+a.  1
+
+b.  2
+
+c.  3
+
+d.  More than 3
+
+e.  Could be any number from 1, 2,...
+
+## Problem 10
+
+Suppose you want to use the time predictor to fit a monthly seasonal time series. How many parameters the equation have?
+
+a.  1
+
+b.  2
+
+c.  3
+
+d.  More than 3
+
+e.  Could be any number from 1, 2,...
+
+------------------------------------------------------------------------

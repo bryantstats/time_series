@@ -1,0 +1,32 @@
+
+---
+title: "Final Project"
+output:
+  word_document:
+    toc: yes
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
+  pdf_document:
+    toc: yes
+---
+
+---
+
+## Time Series 1
+
+```{r}
+# insert your codes here to address all the questions of the project
+```
+
+
+## Time Series 2
+
+-   Describe your time series and the source of the series.
+
+```{r}
+# insert your codes here to address all the questions of the project
+```
+
+------------------------------------------------------------------------

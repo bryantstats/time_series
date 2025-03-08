@@ -1,0 +1,249 @@
+---
+title: "AYU - Individual Week 6"
+format: 
+  html:
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+------------------------------------------------------------------------
+
+**Instruction**: *Scan your answer into pdf/word document then submit to Canvas.*
+
+## Problem 1
+
+Given the following series and their plots.  Match the series with its plot.
+
+a. $y_1 = -1.1y_{t-1} + \epsilon_t$
+
+b. $y_2 = 1.1y_{t-1} + \epsilon_t$
+
+c. $y_3 = -0.2y_{t-1} + \epsilon_t$
+
+#### Plot 1
+
+```{r}
+library(forecast)
+set.seed(2023)
+n = 50
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = -1.1
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+y = ts(y)
+
+autoplot(y)
+```
+
+#### Plot 2
+
+```{r}
+set.seed(2023)
+n = 50
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = -.2
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+y = ts(y)
+
+autoplot(y)
+```
+
+#### Plot 3
+
+```{r}
+set.seed(2023)
+n = 50
+y = rep(0, n)
+
+y[1] = 0
+b0 = 0
+b1 = 1.1
+e = rnorm(n, sd = 1)
+
+for (t in 2:n)
+{
+  y[t] = b0 + b1*y[t-1]+e[t]
+}
+
+y = ts(y)
+
+autoplot(y)
+```
+
+
+## Problem 2
+
+Given the following four AR(1) series and their ACF.  Match the series with its ACF. 
+
+a. $y = -.9y_{t-1} + \epsilon_t$
+
+b. $y = .9y_{t-1} + \epsilon_t$
+
+c. $y = .3y_{t-1} + \epsilon_t$
+
+d. $y = -.5y_{t-1} + \epsilon_t$
+
+#### ACF 1
+
+```{r}
+set.seed(2024)
+y <- arima.sim(list(order=c(1,0,0), ar=-.5), n=100)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+
+
+#### ACF 2
+
+```{r}
+set.seed(2024)
+y <- arima.sim(list(order=c(1,0,0), ar=.1), n=100)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+
+#### ACF 3
+
+```{r}
+set.seed(2024)
+y <- arima.sim(list(order=c(1,0,0), ar= .9), n=100)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+
+
+#### ACF 4
+
+```{r}
+set.seed(2024)
+y <- arima.sim(list(order=c(1,0,0), ar= -.9), n=100)
+b0 = 10
+y <- y + b0
+acf(y)
+```
+
+
+
+
+## Problem 3
+
+You are given the following six observed values of the autoregressive model of order one time series
+
+$$y_t = \beta_0 + \beta_1 y_{t-1} + \epsilon_t, \text{ with   }  Var(\epsilon_t) = \sigma^2.$$
+
+```{r, echo=FALSE}
+library(knitr)
+y =  c(12, 5, 10, 4, 11, 3)
+t = length(y)
+y_bar = mean(y)
+
+u = y[-t]-y_bar
+v = (y-y_bar)[2:t]
+
+b1 = sum(u*v)/sum(u^2)
+b0 = y_bar*(1-b1)  
+
+df = data.frame(t = c(1:6), y = y)
+kable(df)
+```
+
+
+Calculate $\hat{\beta}_1$ using the conditional least squares method.
+
+
+
+## Problem 4
+
+You are given the following six observed values of the autoregressive model of order one time series
+
+$$y_t = \beta_0 + \beta_1 y_{t-1} + \epsilon_t, \text{ with   }  Var(\epsilon_t) = \sigma^2.$$
+
+```{r, echo=FALSE}
+library(knitr)
+y =  c(12, 5, 10, 4, 11, 3)
+t = length(y)
+y_bar = mean(y)
+
+u = y[-t]-y_bar
+v = (y-y_bar)[2:t]
+
+b1 = sum(u*v)/sum(u^2)
+b0 = y_bar*(1-b1)  
+
+df = data.frame(t = c(1:6), y = y)
+kable(df)
+```
+
+
+Estimated $y_{10}$. 
+
+
+## Problem 5
+
+An autoregressive model may not be a good fit for which of the following series?
+
+### Series 1
+
+```{r, echo=FALSE}
+library(quantmod)
+library(forecast)
+y = getSymbols("MSFT")
+y = MSFT$MSFT.Open
+y <- y[index(y) > "2024-01-01"]
+plot(y)
+```
+
+### Series 2
+
+```{r, echo=FALSE}
+library(quantmod)
+library(forecast)
+y = getSymbols("MSFT")
+y = MSFT$MSFT.Open
+y <- y[index(y) > "2024-01-01"]
+y = diff(y)
+plot(y)
+```
+
+### Series 3
+
+```{r, echo=FALSE}
+set.seed(30)
+n = 100
+e1 <- rnorm(n, sd = 1)
+e2 <- rnorm(n, sd = 10)
+e3 <- rnorm(n, sd = 50)
+y = ts(c(e1,e2,e3))
+library(ggfortify)
+autoplot(y)
+```
+
+
+------------------------------------------------------------------------

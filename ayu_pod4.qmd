@@ -1,0 +1,69 @@
+---
+title: "R - Assignment 4"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+### Instruction
+
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
+
+2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+4.  *Submit the pdf/Word to Canvas.*
+
+------------------------------------------------------------------------
+
+Use the sample codes from the class slides to complete this Assignment
+
+[Class Slides](note4.html)
+
+## Question 1.
+
+We will work on the below dataset.
+
+Dataset: Percentage changes in quarterly personal consumption expenditure, personal disposable income, production, savings and the unemployment rate for the US, 1970 to 2016.
+
+[Download](uschange.csv)
+
+Do the follows.
+
+1. Run a linear regression with the response variable `Consumption` and predictor `Production `. 
+
+2. Write the equation with the estimated parameters. 
+
+3. Report the $R^2$. 
+
+4. Plot the scatter plot between the fitted values and the response values. How well the model fit the data?
+
+5. Forecast the next value of the `consumption` by setting the value of the predictor to be the average of the `Production`. (You can see [this slide](https://bryantstats.github.io/time_series/note4#53) for a sample code)
+
+6. Redo 1-5 with the the response variable `Consumption` and predictors are the remaining variables (i.e., `Income`, `Production`, `Savings` and `Unemployment`). 
+
+7. Suppose we can only choose two predictors for the response `Consumption`.  What are the two predictors that give the highest $R^2$? (For this question you will need to run all the possible regression with two predictors to choose the pair that produces the greatest $R^2$) 
+
+
+## Question 2. 
+
+Given the following time series.  
+
+Dataset: Monthly Airline Passenger Numbers 1949-1960
+
+[Download](AirPassengers.csv)
+
+1. Import the data and apply an appropriate linear regression on the series.  
+
+2. Report the $R^2$ of the model.  
+
+3. Plot the scatter plot between the fitted values and the response values. 
+
+4. How well the model fit the data?
+
+5. Plot a forecast on the next values of the series. 
+
+
+------------------------------------------------------------------------

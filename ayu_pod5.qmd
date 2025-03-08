@@ -1,0 +1,64 @@
+---
+title: "R - Assignment 5"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+### Instruction
+
+1.  *Download the Rmarkdown file at [this link](R_submission.Rmd)*
+
+2.  *Open the submission file using Rstudio and write R codes below each question to answer the question. To insert a code chunk, use Ctrl + Alt + I.*
+
+3.  *Once you are done answering all the question, Knit the file (Use: Ctrl + Shift + K or Click to Knit -\> Knit to pdf) to convert the Rmarkdown file into a pdf file.*
+
+4.  *Submit the pdf/Word to Canvas.*
+
+------------------------------------------------------------------------
+
+Use the sample codes from the class slides to complete this Assignment
+
+[Class Slides](note5.html)
+
+## Question 1: Random Walk Simulation
+
+- Simulate a random walk where the white-noise is a  student-t distribution with degree freedom of 2024. (Use the function `rt` to generate the t random variables, i.e. `rt(n, df = 2024)`)
+
+- Plot the random walk
+
+- Plot the acf of a random walk.  Does the autocorrelation stays in the blue strip?
+
+- Plot the differenced series of the random walk.
+
+- Plot the acf of the differenced series. 
+
+- Does the differenced series have signs of a white-noise?
+
+
+## Question 2: Modeling with Random Walk
+
+- Use the `quantmod` package to plot the stock of Apple in 2024. 
+
+- Plot differenced series of the stock
+
+- Plot the ACF of the stock
+
+- Does the differenced series have signs of a white-noise?
+
+- Use the random walk model to make and plot a forecast for the stock. 
+
+
+```{r, echo=FALSE, eval=FALSE}
+library(quantmod)
+getSymbols('AAPL', src='yahoo')
+y = Ad(AAPL[index(AAPL)>"2023-01-01",])
+d = diff(y)
+plot(d)
+acf(d, na.action = na.pass)
+```
+
+
+
+------------------------------------------------------------------------

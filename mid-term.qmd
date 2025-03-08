@@ -1,0 +1,116 @@
+---
+title: "Midterm - Exam/Project"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, eval = FALSE)
+```
+
+------------------------------------------------------------------------
+
+*Instruction:*
+
+-   ***Step 1:** In this mid-term exam, you are asked to work with a **monthly** time series of your choice. This series should not be the same as the series we have used in the class. So the first step is to find a monthly time series dataset to work with*
+
+-   ***Step 2:** Download the below Rmarkdown*
+
+    [Rmarkdown](project_ts_sample.Rmd)
+
+-   ***Step 3:** In the Rmarkdown, address all of the questions. Your answers will be either in text (For example: there is question on commenting on the trend of the series or question on explaining the main idea of moving average) and codes (which you can use the sample codes to answer).*
+
+-   *The sample codes for the series can be found at links below. All the codes in this mid-term exam should be available on the sample codes.*
+
+    [Sample codes](project_ts_codes.html)
+    
+    [Sample codes 2](project_ts_codes3.html)
+
+-   ***Step 4.** Knit the Rmarkdown to Word document. Submit the Word document to Canvas.*
+
+The structure of the Exam is as follows. 
+
+------------------------------------------------------------------------
+
+## 1. Data Exploration
+
+-   Describe your time series and the source of the series.
+
+-   Import the series. *Note: Make sure you specify the correct starting time and frequency for the series.*
+
+-   Plot the time series.
+
+-   Comment on the trend of the series (does the series have trend? upward or downward? from when to when, etc).
+
+-   Comment on the seasonality of the series (does the series have seasonal component? if so, what is the seasonal period, etc.)
+
+-   Comment on the seasonality of the series. Notice that trend or seasonal series is not stationary, being stationary implying having constant variance and constant mean.
+
+### 1.1 Smoothing
+
+-   *Moving Average*: Explain the main idea of Moving average. Apply the MA method on the series. Plot the original series and its MA smoothing. Try a few different moving average $k$ and comment on the trend of the series through the smoothing curve. What values of $k$ best reveal the series pattern?
+
+-   *Exponential Smoothing* (ES): Explain the main idea of exponential smoothing. Apply the ES method on the series. Plot the original series and its ES smoothing. Try a few different weights comment on the trend of the series through the smoothing curve. What values of the weight best reveal the series' pattern? Compare the ES curve and the MA curve above.
+
+### 1.2 Auto-correltion
+
+-   Explain what the Auto-correlation Function (ACF) is and plot the ACF of the series. What is the first value of the ACF (ACF when the lag is 0) Is the series stationary according to the look of the ACF?
+
+```{r}
+acf(y)
+```
+
+## 2. Modelling
+
+We will implement the following models to make a forecast for the series.
+
+-   The Mean/Average model: forecast by the average of the training series
+
+-   The Naive Model: forecast by the last observation of the series
+
+-   The Seasonal Naive Model: forecast by the values of the last season
+
+-   All the exponential smoothing models
+
+-   The regression model
+
+-   Random Walk with drift Model: Drawing the line from the first to the last observation
+
+To evaluate the models, We will use a machine learning approach, which is use a portion of the data for training and the remainder data for testing. We also perform residual analysis for the models.
+
+### 2.1 Model Training
+
+Follow the sample codes to.
+
+-   Split the original series into the training series and the testing series
+
+-   Train all the models on the training series
+
+### 2.2 Residual Analysis
+
+A `good` model would have residuals looks like white-noise of a mean zero normal distribution, which means
+
+-   The residuals should have no autocorrelation.
+-   The residuals should have a mean zero
+-   The residuals should have constant variance
+-   The residuals should be normally distributed
+
+Report the residuals analysis of all the models. Which model would you consider `good` models? Some indications of a `good` model could be
+
+-   The ACF is within the blue strip
+-   The distribution of the residual follows a bell curve
+-   The p-value of the Ljung-Box test is large
+
+### 2.3 Testing Accuracy
+
+-   Calculate the forecast of all the models on the validation period. Calculate the Mean absolute percentage error (MAPE) of all the models. Plot the forecast of all models.
+
+-   Which model gives the lowest MAPE? Which model gives the greatest MAPE?
+
+## 3. Forecasting
+
+Based on the MAPE above, decide the selected model. Retrain the best model on the entire series. Use the retrained model to forecast the next values. Plot the series and the forecast values.
+
+------------------------------------------------------------------------

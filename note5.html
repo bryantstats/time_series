@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title> Random Walk Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" Son Nguyen " />
+    <script src="libs/header-attrs-2.23/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# <img src="random_walk.png" /> Random Walk Models
+]
+.author[
+### <font size="5"> Son Nguyen </font>
+]
+
+---
+
+
+&lt;style&gt;
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide &gt; h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide &gt; h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide &gt; h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+&lt;/style&gt;
+
+
+
+
+# Random Walk
+
+-   A time series `\(y_t\)` is called a random walk if
+
+    `$$y_{t} =  y_{t-1} +  \epsilon_t,$$`
+
+    where `\(\epsilon_t\)` is a white-noise with mean zeros
+
+-   For the equation we also have `\(y_{t-1} = y_{t-2}+\epsilon_{t-1}\)` and `\(y_{t-2} = y_{t-3}+\epsilon_{t-2}\)` so on. 
+
+- Thus, a random walk can be written as
+
+`\begin{align}
+y_t &amp;= y_{t-1}+\epsilon_t \\
+    &amp;= (y_{t-2}+ \epsilon_{t-1}) + \epsilon_t \\
+    &amp;=  ... \\
+    &amp;= y_0 + \epsilon_1 + \epsilon_2 +...+\epsilon_t 
+\end{align}`
+
+---
+class: inverse, center, middle
+
+# Simulating Random Walk
+
+---
+# Simulating Random Walk
+
+To simulate a random walk we would need two things
+
+(1) The initial value `\(y_0\)`
+
+(2) The white noise series `\(\epsilon_t\)` ( `\(\epsilon_1\)`, `\(\epsilon_2\)`, ... , `\(\epsilon_t\)`)
+
+
+---
+# Example
+
+In this example, we will simulate/generate a random walk with
+
+- `\(y_0 = 10\)`
+
+- `\(\epsilon_t\)` following a `coin tossing` distribution where `\(\epsilon_t = 1\)` if the coin lands Head and `\(\epsilon_t = -1\)` if the coin lands tail. 
+
+- We assume that the coin is fair so that `\(E(\epsilon_t = 0)\)` making it a white noise distribution. 
+
+---
+# Example
+
+- We first generate the `\(\epsilon_t\)` using the `sample` function as follows.  
+
+
+```r
+n  = 100  
+e_t = sample(c(-1, 1), n, replace =  TRUE)
+e_t
+```
+
+```
+##   [1] -1  1 -1  1  1 -1 -1  1  1 -1  1  1  1  1 -1 -1  1 -1  1 -1  1 -1  1 -1 -1
+##  [26] -1 -1  1  1 -1  1 -1  1 -1  1  1 -1  1 -1 -1 -1 -1 -1 -1 -1 -1 -1  1  1  1
+##  [51]  1  1 -1  1 -1 -1  1 -1  1  1  1  1  1  1  1  1  1  1  1 -1  1  1  1  1 -1
+##  [76]  1 -1  1 -1  1  1  1 -1 -1  1 -1  1  1  1 -1  1 -1 -1  1 -1 -1 -1 -1 -1  1
+```
+
+---
+# Example
+
+- We then create `\(y_t = y_0 + \epsilon_1 + \epsilon_2 +...+\epsilon_t\)` using the `cumsum` function. 
+
+
+```r
+y0 = 10
+
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Example
+
+- Notice that since this is a random process every time we run the codes, we will obtain a different random walk. 
+
+
+```r
+n  = 100  
+e_t = sample(c(-1, 1), n, replace =  TRUE)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Example
+
+- Rerun the same codes. Notice a different random walk. 
+
+
+```r
+n  = 100  
+e_t = sample(c(-1, 1), n, replace =  TRUE)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Example
+
+- To fix the randomness, i.e., reproduce the series the next time we run the code, we could use the function `set.seed` before creating the the randomness ($\epsilon_t$)
+
+
+
+```r
+n  = 100  
+set.seed(2024)
+e_t = sample(c(-1, 1), n, replace =  TRUE)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Example
+
+- Let run these same codes. Notice the random walk remains the same.  
+
+
+
+```r
+n  = 100  
+set.seed(2024)
+e_t = sample(c(-1, 1), n, replace =  TRUE)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Example
+
+- In the below codes, we create a random walk with the white noise `\(\epsilon\)` follows a standard normal distribution (Gaussian distribution). 
+
+- We use the function `rnorm` to generate the Gaussian white noise. 
+
+
+```r
+set.seed(2024)
+n = 100
+e_t &lt;- rnorm(n, mean = 0, sd = 1)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# Example
+
+- We can control the noise ( or variance) of the series by the standard deviation of `\(\epsilon\)`. Notice the range of the series is greater when the standard deviation of `\(\epsilon_t\)` increasing. 
+
+
+```r
+set.seed(2024)
+n = 100
+e_t &lt;- rnorm(n, mean = 0, sd = 10)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+
+---
+# Example
+
+- Notice the range of the series is greater when the standard deviation of `\(\epsilon_t\)` increasing. 
+
+
+```r
+set.seed(2024)
+n = 100
+e_t &lt;- rnorm(n, mean = 0, sd = 100)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+plot(ts(y))
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Stationary and Differencing
+
+- We notice from the previous plots that random walk has trend and therefore is not stationary. 
+
+- Also notice that from the definition of random walk
+
+`$$y_{t} =  y_{t-1} +  \epsilon_t$$`
+We have, 
+
+`$$y_{t} - y_{t-1} =  \epsilon_t$$`
+Thus the differenced series of a random walk `\(d_t = y_{t} - y_{t-1}\)` is actually a white noise process, and hence iti is stationary. 
+
+
+---
+# Differencing
+
+- We will plot the differenced series `\(d_t = y_{t} - y_{t-1}\)` and its acf to verify that the stationarity of the differenced series. 
+
+- We use function `diff` to calculate the differenced series.
+
+
+
+```r
+set.seed(2024)
+n = 100
+e_t &lt;- rnorm(n, mean = 0, sd = 100)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+y = ts(y)
+
+d = diff(y)
+```
+
+---
+
+- The differenced series does not have trend and seasonality which are signs of stationary series. 
+
+
+```r
+plot(d)
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+- The autocorrelations are also within the blue strip, which is a sign of stationary. 
+
+
+```r
+acf(d)
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+class: inverse, center, middle
+
+# Random Walk with drift
+
+
+---
+# Random Walk with drift
+
+-   A time series `\(y_t\)` is called a random walk if
+
+    `$$y_{t} =  y_{t-1} +  d + \epsilon_t,$$`
+
+    where `\(\epsilon_t\)` is a white-noise
+    
+
+-   A random walk can be written as
+    
+`\begin{align}
+y_t &amp;= y_{t-1}+ d + \epsilon_t \\
+    &amp;= (y_{t-2}+ d + \epsilon_{t-1}) + d + \epsilon_t \\
+    &amp;= y_{t-2}+ 2d + \epsilon_{t-1}) +  \epsilon_t \\
+    &amp;=  ... \\
+    &amp;= y_0 + d \cdot t + \epsilon_1 + \epsilon_2 +...+\epsilon_t 
+\end{align}`
+
+- From the above equation, we observe that a random walk with drift has a linear component `\(d\cdot t\)`
+
+
+$$
+y_t = y_0 + dt + \epsilon_1 + \epsilon_2 +...+\epsilon_t
+$$
+
+
+---
+# Example
+
+- A random walk with drift `\(d\)` can be written as 
+
+`\begin{align}
+y_t &amp;= y_{t-1}+ \epsilon_t \\
+    &amp;= y_{t-1} + \epsilon*_t,
+\end{align}`
+
+where `\(\epsilon*_t\)` is a series of random variables with the mean `\(d\)` (Some sources will say it is a white noise series with non-zero mean). 
+
+
+---
+# Example
+
+- To simulate a white-noise process with drift, we just need to modify the previous codes so that the `\(\epsilon\)` has the mean being the value of the drift. 
+
+.left-code[
+
+```r
+set.seed(2024)
+n = 100
+drift = 2
+
+e_t &lt;- rnorm(n, mean = drift, sd = 5)
+
+y0 = 10
+y = cumsum(c(y0,e_t))
+y = ts(y)
+plot(y)
+```
+]
+.right-plot[
+&lt;img src="note5_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+
+---
+class: inverse, center, middle
+
+# Random Walks and Stocks
+
+---
+# Random Walks and Stocks
+
+- We will plot a few stocks to see if a random walk could be a good fit for the data. 
+
+- To plot stocks, we will use the package `Quantmod`. 
+
+- The quantmod package for R is designed to assist the quantitative trader in the development, testing, and deployment of statistically based trading models.
+
+- Find out more at: https://www.quantmod.com/
+
+- To install the package, we use (we just need to do it one time only.)
+
+
+```r
+install.packages('quantmod')
+```
+
+
+---
+# Random Walks and Stocks
+
+- Let plot the stock of Microsoft since 2023
+
+
+```r
+library(quantmod)
+getSymbols('MSFT', src='yahoo')
+```
+
+```
+## [1] "MSFT"
+```
+
+```r
+y = Ad(MSFT[index(MSFT)&gt;"2023-01-01",])
+```
+
+---
+
+
+```r
+plot(y)
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-17-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+- How do we know that a random walk can be a good model/fit for the stock data?  
+
+- We know that the differenced series of the stock is a white noise process.  
+
+- So we can plot the differenced series and the acf of the differenced series to see if the differenced series could be a white-noise.
+
+---
+
+
+```r
+d = diff(y)
+plot(d)
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+acf(diff(y), na.action = na.pass)
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+The differenced series has many signs of a white noise.  The signs are as follows. 
+
+- The plot of the differenced series does not show any trend and seasonality. 
+
+- The variance of the series seems to unchanged over the time
+
+- The autocorrelations re within the blue strip indicating that the autocorrelation are zeroes. 
+
+
+Therefore, it is very reasonable to assume that the stock follows the random walk model. 
+
+---
+# Forecasting with Random Walk
+
+- How can we forecast with random walk model? 
+
+- Notice that `\(y_t =  y_{t-1} + \epsilon_t\)` and since we cannot predict `\(\epsilon_t\)` as it is random, the best prediction for `\(y_t\)` is `\(y_{t-1}\)`. 
+
+- With drift, `$$y_t =  y_{t-1} + d + \epsilon_t$$` we just need to estimate `\(d\)`, which is the slope of the linear component.
+
+- The slope `\(d\)` can be estimate as the slope of the line connecting the first value ( `\(y_0\)`) and the most recent value ( `\(y_{t-1}\)`)
+
+- In R, we use the function `rwf` of the package `forecast` to make the forecast with random walk
+
+---
+# Forecasting with Random Walk
+
+- Let continue the codes of from the previous slides, where we have the series of the Microsoft stock and plot the foreast using random walk model.
+
+
+```r
+rw_forecast = rwf(y, drift = TRUE)
+rw_forecast
+```
+
+```
+##     Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## 321       428.5284 422.4444 434.6124 419.2238 437.8330
+## 322       429.1268 420.5094 437.7443 415.9476 442.3061
+## 323       429.7252 419.1546 440.2958 413.5589 445.8916
+## 324       430.3236 418.0988 442.5485 411.6274 449.0199
+## 325       430.9221 417.2331 444.6110 409.9867 451.8575
+## 326       431.5205 416.5019 446.5391 408.5515 454.4894
+## 327       432.1189 415.8720 448.3657 407.2715 456.9663
+## 328       432.7173 415.3221 450.1125 406.1136 459.3210
+## 329       433.3157 414.8371 451.7943 405.0551 461.5763
+## 330       433.9141 414.4063 453.4220 404.0794 463.7488
+```
+
+---
+# Forecasting with Random Walk
+
+
+```r
+plot(rw_forecast)
+```
+
+&lt;img src="note5_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+---
+title: "Final Exam/Project"
+format: 
+  html: 
+    toc: true
+editor: visual
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, eval = FALSE)
+```
+
+------------------------------------------------------------------------
+
+[**Instruction.**]{.underline}
+
+In this final project, we will compare the performance of classical time series models covered in the courses and machine learning models in time series forecasting. The performances of the models will be evaluated using the Mean Absolute Percentage Error or MAPE. 
+
+You will work with two time series dataset. The first time series dataset is given to you in the below link. This is a series of US Retail Employment. The time index are given in the dataset. 
+
+[Download Dataset](data/us_retail_employment.csv)
+
+The second dataset is a monthly dataset of your own choice.
+
+You are asked to write and knit your codes in Word Document and submit the knitted Word Documents to Canvas.  A sample of Rmarkdown could be find at the below link.
+
+[Sample Rmarkdown](final_project_ts_sample.Rmd)
+
+The sample codes for the project can be found at the below link.
+
+[Sample R codes](note10.html)
+
+For each of the datasets, do the follows.
+
+1. (For the second dataset only) Introduce the dataset and the source of the dataset. 
+
+2.  Read the data in and partition the dataset with 80% of the first values are for training and the remainder 20% are for testing the model.
+
+3.  Train the following models. For each model, plot the forecasting and the training values in the same plot. Report the MAPE for each model.
+
+-   (Basic Time Series Models) Average Model: forecast by the average of the training series
+-   (Basic Time Series Models) Naive Model: forecast by the last observation of the series
+-   (Basic Time Series Models) Seasonal naive Model: forecast by the last season
+-   (Basic Time Series Models) Drift: forecasting from the line drawn from the first to the last observation
+-   At least five Exponential Smoothing Models
+-   At least two regression models
+-   ARIMA Model
+-   Seasonal ARIMA (SARIMA) Model
+-   At least 10 machine learning models. 
+
+Notice that:  If you run into an error with a machine learning model, you can try another machine learning model. For the list of available machine learning models, you can refer to [this link.](https://topepo.github.io/caret/available-models.html)
+
+4.  Rank all the models based on their MAPE on the testing data. What is the best model in terms of MAPE?
+
+------------------------------------------------------------------------

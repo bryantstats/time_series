@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Exponential Smoothing Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" Son Nguyen " />
+    <script src="libs/header-attrs-2.26/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Exponential Smoothing Models
+]
+.author[
+### <font size="5"> Son Nguyen </font>
+]
+
+---
+
+
+&lt;style&gt;
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide &gt; h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide &gt; h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide &gt; h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+&lt;/style&gt;
+
+
+
+
+# Components of Time Series
+
+- We know that a series may have three components: trend, seasonality and cycle. 
+
+- For simplicity, the trend and the cycle are usually combined into one component called trend-cycle or just trend.
+
+Thus, a series can only be one of the three following cases
+
+- (1) Has no trend and no seasonality
+
+- (2) Has trend and no seasonality
+
+- (3) Has trend and seasonality
+
+---
+# Forecasting with ES
+
+We can use exponential smoothing to make forecast for all the three types of time series mentioned earlier. 
+
+- Use `Simple ES` to forecast series with no trend and no seasonality
+
+- Use `Holt’s Method` (or double ES) to forecast series with trend and no seasonality. 
+
+- Use `Holt-Winters Method` (or triple ES): to forecast series with trend and seasonality. 
+
+---
+class: inverse, center, middle
+
+# Simple Exponential Smoothing
+
+
+---
+# Simple Exponential Smoothing
+
+- We use this method to forecast series with a constant level (no trend) and no seasonality.  The equations to calculate the forecast are as follows. 
+
+`\begin{align*}
+&amp;\text{Forecast Equation:} &amp;\hat{y}_{t+h} &amp;=  l_t \\
+&amp;\text{Level Equation:}    &amp;l_t           &amp;=  \alpha y_t + (1-\alpha)l_{t-1}
+\end{align*}`
+
+- We observe that  `\(w = 1- \alpha\)` in exponential smoothing that we defined last week. 
+
+- The forecast calculation needs two parameters  `\(l_0\)` (initial level) and `\(\alpha\)` (smoothing parameter)
+
+---
+# Parameters Estimation
+
+- We notice that different parameters ( `\(l_0\)` and `\(\alpha\)`) will yield different forecasting
+
+- What would be the parameters yield the best forecasting?
+
+- The bets parameters are the parameters that produces `\(\hat{y}_t\)` that minimizes the sum squares errors (SSE)
+
+$$
+SSE = \sum_{t=1}^T(y_t - \hat{y}_t)
+$$
+
+---
+# SES in R
+
+- We will use SES to make forecast for the time series of annual rainfall in London since 1813. 
+
+[Dataset](data/rainfall_london.csv)
+
+---
+# SES in R
+
+- We first plot the series to see if we could use SES to make forecasts. 
+
+
+```r
+library(forecast)
+rain &lt;- read.csv('data/rainfall_london.csv')
+y &lt;- ts(rain,start=c(1813))
+plot(y)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
+
+- The plot indicates that the series has no trend and no seasonality.  So we can use SES on this series. 
+
+
+---
+# SES in R
+
+- We can use function `ses` to implement SES
+
+
+```r
+y_h = ses(y, h = 5)
+y_h$model
+```
+
+```
+## Simple exponential smoothing 
+## 
+## Call:
+##  ses(y = y, h = 5) 
+## 
+##   Smoothing parameters:
+##     alpha = 1e-04 
+## 
+##   Initial states:
+##     l = 24.8243 
+## 
+##   sigma:  4.2362
+## 
+##      AIC     AICc      BIC 
+## 753.2297 753.4797 761.0452
+```
+
+- What are the best parameters for this SES?  We notice that `\(\alpha = 1e-04\)` and `\(l_0 = 24.8243\)`
+
+---
+# SES in R
+
+- Plot the smoothed series
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+- We notice that the smoothed series since `\(\alpha \approx 0\)`, the smoothing is at its maximum where the smoothed series is just the average of the original series (and vice versa, `\(\alpha = 1\)` would make the smoothed series the same as the original series, or no smoothing at all).   
+
+---
+# SES in R
+
+- Make the forecast
+
+
+```r
+y_h
+```
+
+```
+##      Point Forecast    Lo 80   Hi 80    Lo 95    Hi 95
+## 1913       24.82431 19.39541 30.2532 16.52152 33.12709
+## 1914       24.82431 19.39541 30.2532 16.52152 33.12709
+## 1915       24.82431 19.39541 30.2532 16.52152 33.12709
+## 1916       24.82431 19.39541 30.2532 16.52152 33.12709
+## 1917       24.82431 19.39541 30.2532 16.52152 33.12709
+```
+
+- The forecast is a constant going to the future
+
+---
+# SES in R
+
+- Plot the forecast
+
+
+```r
+plot(y_h)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Problem 1
+
+Given the following time series `\(y_t\)`.     
+
+
+|  t|   y|
+|--:|---:|
+|  1| 2.5|
+|  2| 3.0|
+|  3| 1.7|
+|  4| 2.0|
+|  5| 2.8|
+
+- Assume that the series does not have the trend and seasonality component. What is the parameters of simple exponential smoothing that best forecast the series? 
+
+- Make a forecast using the SES with these parameters to forecast the three next values of the series.
+
+---
+# Solution
+
+- We will use R to solve this problem.  We first create the series then use the `ses` function to find the best parameters. 
+
+
+```r
+# Create the series using the ts function
+y = ts(c(2.5, 3, 1.7, 2, 1.8))
+
+# implement SES 
+y_h = ses(y, h = 3)
+y_h$model
+```
+
+```
+## Simple exponential smoothing 
+## 
+## Call:
+##  ses(y = y, h = 3) 
+## 
+##   Smoothing parameters:
+##     alpha = 0.3869 
+## 
+##   Initial states:
+##     l = 2.5 
+## 
+##   sigma:  0.5448
+```
+
+- We observe that the best parameters are `\(l_0 = 2.5\)` and `\(\alpha = 0.3869\)`
+
+---
+# Solution
+
+The forecast of the three next values are
+
+
+```r
+y_h
+```
+
+```
+##   Point Forecast    Lo 80    Hi 80     Lo 95    Hi 95
+## 6       2.038798 1.340573 2.737023 0.9709555 3.106641
+## 7       2.038798 1.290135 2.787462 0.8938162 3.183780
+## 8       2.038798 1.242886 2.834710 0.8215556 3.256041
+```
+
+---
+# Solution
+
+The forecast of the three next values are
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+class: middle, inverse, center
+
+# Holt's Method
+
+
+
+---
+# Holt's Method
+
+- We use this method to forecast series with a constant trend and no seasonality.  The equations to calculate the forecast are as follows. 
+
+`\begin{align*}
+&amp;\text{Forecast Equation:} &amp;\hat{y}_{t+h} &amp;=  l_t + hb_t \\
+&amp;\text{Level Equation:}    &amp;l_t           &amp;=  \alpha y_t + (1-\alpha)(l_{t-1}+b_{t-1}) \\
+&amp;\text{Trend Equation:}    &amp;b_t           &amp;=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*})b_{t-1}
+\end{align*}`
+
+- The forecast calculation needs the following parameters
+
+    - `\(l_0\)` (initial level value), 
+    - `\(b_0\)` (initial trend value)
+    - `\(\alpha\)` (level smoothing parameter) and 
+    - `\(\beta^{*}\)` (trend smoothing parameter)
+    
+- Similar to the SES model, these parameters are estimated by minimizing the `\(SSE = \sum_{t=1}^T(y_t - \hat{y}_t)\)`
+
+
+---
+# Example
+
+- Let consider the series of total annual air passengers including domestic and international aircraft passengers of air carriers registered in Australia. 1970-2009.
+
+[Dataset](data/ausair.csv)
+
+---
+# Example
+
+- Plot the series
+
+
+```r
+df &lt;- read.csv('data/ausair.csv')
+y = ts(df, start = c(1970), frequency = 1)
+plot(y)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+- We observe that the series has a trend (upward) so we can use Holt's method to make forecast for this series
+
+
+---
+# Example
+
+- We use the `holt` function to implement the Holt's method as follows
+
+
+```r
+y_h &lt;- holt(y, h=5)
+y_h$model
+```
+
+```
+## Holt's method 
+## 
+## Call:
+##  holt(y = y, h = 5) 
+## 
+##   Smoothing parameters:
+##     alpha = 0.848 
+##     beta  = 0.097 
+## 
+##   Initial states:
+##     l = 6.5176 
+##     b = 0.6821 
+## 
+##   sigma:  2.0755
+## 
+##      AIC     AICc      BIC 
+## 255.4134 256.8769 264.6642
+```
+
+- We can read the estimated parameters from the results.
+
+---
+# Example
+
+- Plot the smoothed series
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Example
+
+- Plot the smoothed series
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+- Since `\(\alpha = 0.848\)` are quite large (closer to 1), the smoothing is very light making the smoothed series is very close to the original series. 
+
+---
+# Example
+
+- Make the forecast
+
+
+```r
+y_h
+```
+
+```
+##      Point Forecast    Lo 80    Hi 80    Lo 95    Hi 95
+## 2017       74.74216 72.08236 77.40197 70.67434 78.80998
+## 2018       76.96124 73.30183 80.62066 71.36465 82.55784
+## 2019       79.18033 74.59003 83.77063 72.16007 86.20059
+## 2020       81.39941 75.89975 86.89907 72.98841 89.81042
+## 2021       83.61849 77.21143 90.02556 73.81974 93.41725
+```
+
+
+---
+# Example
+
+- Plot the forecast
+
+
+```r
+plot(y_h)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+class: middle, inverse, center
+
+# Damped trend methods
+
+
+---
+# Damped trend methods
+
+- Holt’s method produce a linear forecasting into the future. The slope of this linear trend is a constant
+
+- Empirical evidence indicates that these methods tend to over-forecast, especially for longer forecast horizons.
+
+- The Damped trend methods introduced a parameter that “dampens” the trend to a flat line some time in the future. 
+
+- Damped trend methods have proven to be very successful, and are among the most popular individual methods. 
+
+
+---
+# Damped trend methods
+
+- We use this method to forecast series with a constant trend and no seasonality.  The equations to calculate the forecast are as follows. 
+
+`\begin{align*}
+&amp;\text{Forecast Equation:} &amp;\hat{y}_{t+h} &amp;=  l_t + (\phi + \phi^2 + ... + \phi^h)b_t \\
+&amp;\text{Level Equation:}    &amp;l_t           &amp;=  \alpha y_t + (1-\alpha)(l_{t-1}+\phi b_{t-1}) \\
+&amp;\text{Trend Equation:}    &amp;b_t           &amp;=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*})\phi b_{t-1}
+\end{align*}`
+
+- The forecast calculation needs the following parameters
+
+    - `\(l_0\)` (initial level value), 
+    - `\(b_0\)` (initial trend value)
+    - `\(\alpha\)` (level smoothing parameter) and 
+    - `\(\beta^{*}\)` (trend smoothing parameter)
+    - `\(\phi\)`, damping parameter, `\(0 &lt; \phi &lt;1\)`
+    
+- Notice that when `\(\phi = 1\)`, the Damped trend methods become the Holt's method
+
+- In practice, `\(\phi\)` is usually chosen from .8 to .98
+
+
+---
+# Example
+
+- We use the same `holt` function to implement the method. 
+
+
+```r
+y_h &lt;- holt(y, damped = TRUE, h=5)
+y_h$model
+```
+
+```
+## Damped Holt's method 
+## 
+## Call:
+##  holt(y = y, h = 5, damped = TRUE) 
+## 
+##   Smoothing parameters:
+##     alpha = 0.8444 
+##     beta  = 0.1284 
+##     phi   = 0.98 
+## 
+##   Initial states:
+##     l = 6.4819 
+##     b = 0.6619 
+## 
+##   sigma:  2.1284
+## 
+##      AIC     AICc      BIC 
+## 258.6755 260.7755 269.7764
+```
+
+- We can read the estimated parameters from the results.
+
+---
+# Example
+
+- Plot the smoothed series
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+---
+# Example
+
+- Plot the forecast
+
+
+```r
+plot(y_h)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Problem 2
+
+Given the following time series `\(y_t\)`.     
+
+
+|  t|    y|
+|--:|----:|
+|  1|  2.5|
+|  2|  3.0|
+|  3|  4.7|
+|  4|  5.0|
+|  5|  7.8|
+|  6|  9.0|
+|  7| 10.0|
+|  8| 11.0|
+|  9| 12.0|
+| 10| 12.5|
+
+- Assume that the series have the trend and no seasonality component. What is the parameters of Holt's method that best forecast the series? 
+
+- Make a forecast for the next value of the series
+
+---
+# Solution
+
+- We will use R to solve this problem. 
+
+
+```r
+# Create the series using the ts function
+y = ts(c(2.5, 3, 4.7, 5, 7.8, 9, 10, 11, 12, 12.5))
+
+# implement Holt 
+y_h = holt(y, h = 1)
+y_h$model
+```
+
+```
+## Holt's method 
+## 
+## Call:
+##  holt(y = y, h = 1) 
+## 
+##   Smoothing parameters:
+##     alpha = 1e-04 
+##     beta  = 1e-04 
+## 
+##   Initial states:
+##     l = 1.0499 
+##     b = 1.2105 
+## 
+##   sigma:  0.6788
+## 
+##      AIC     AICc      BIC 
+## 20.16838 35.16838 21.68130
+```
+- The best parameters are found above
+
+---
+# Solution
+
+The forecast of the three next values are
+
+
+```r
+y_h
+```
+
+```
+##    Point Forecast    Lo 80    Hi 80    Lo 95   Hi 95
+## 11       14.36612 13.49623 15.23601 13.03574 15.6965
+```
+
+---
+# Solution
+
+The forecast of the three next values are
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Problem 3
+
+Given the following time series `\(y_t\)`.     
+
+
+|  t|    y|
+|--:|----:|
+|  1|  2.5|
+|  2|  3.0|
+|  3|  4.7|
+|  4|  5.0|
+|  5|  7.8|
+|  6|  9.0|
+|  7| 10.0|
+|  8| 11.0|
+|  9| 12.0|
+| 10| 12.5|
+
+- Assume that the series have the trend and seasonality component. What is the parameters of Damped Holt's method that best forecast the series? 
+
+- Make a forecast for the next value of the series
+
+
+---
+# Solution
+
+- We will use R to solve this problem. The parameters are as follows.
+
+
+```r
+# Create the series using the ts function
+y = ts(c(2.5, 3, 4.7, 5, 7.8, 9, 10, 11, 12, 12.5))
+
+# implement Holt 
+y_h = holt(y, damped =  TRUE, h = 1)
+y_h$model
+```
+
+```
+## Damped Holt's method 
+## 
+## Call:
+##  holt(y = y, h = 1, damped = TRUE) 
+## 
+##   Smoothing parameters:
+##     alpha = 1e-04 
+##     beta  = 1e-04 
+##     phi   = 0.9784 
+## 
+##   Initial states:
+##     l = 0.8159 
+##     b = 1.3854 
+## 
+##   sigma:  0.7016
+## 
+##      AIC     AICc      BIC 
+## 21.00779 49.00779 22.82330
+```
+- The forecast of the next value is
+
+
+```r
+y_h
+```
+
+```
+##    Point Forecast   Lo 80    Hi 80   Lo 95    Hi 95
+## 11        14.2146 13.3154 15.11379 12.8394 15.58979
+```
+
+
+---
+class: middle, inverse, center
+
+# Holt-Winters’ seasonal method
+
+---
+# Holt-Winters’ seasonal method
+
+- We use this method to forecast series with a trend and seasonality.  
+
+- There are two variations to this method that differ in the nature of the seasonal component 
+
+    - Holt-Winters’ additive method
+    
+    - Holt-Winters’ multiplicative method
+
+
+---
+# Holt-Winters’ additive method
+
+Holt-Winters’ additive method's Equations are as follows. 
+
+`\begin{align*}
+&amp;\text{Forecast Equation:} &amp;\hat{y}_{t+h} &amp;=  l_t + hb_t + s_{t+h-mk-m} \\
+&amp;\text{Level Equation:}    &amp;l_t           &amp;=  \alpha (y_t - s_{t-m} + (1-\alpha)(l_{t-1}+ b_{t-1}) \\
+&amp;\text{Trend Equation:}    &amp;b_t           &amp;=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*}) b_{t-1} \\
+&amp;\text{Seasonal Equation:}    &amp;s_t           &amp;=  \gamma (y_t - l_{t-1} - b_{t-1}) + (1-\gamma) s_{t-m}
+\end{align*}`
+
+- The forecast calculation needs six parameters
+
+    - `\(l_0\)` (initial level value), 
+    - `\(b_0\)` (initial trend value)
+    - `\(s_0\)` (initial trend value)
+    - `\(\alpha\)` (level smoothing parameter) and 
+    - `\(\beta^{*}\)` (trend smoothing parameter)
+    - `\(\gamma\)` (seasonal smoothing parameter)
+    
+    
+---
+# Holt-Winters’ multiplicative method    
+    
+Holt-Winters’ additive method's Equations are as follows. 
+
+`\begin{align*}
+&amp;\text{Forecast Equation:} &amp;\hat{y}_{t+h} &amp;=  (l_t + hb_t)s_{t+h-mk-m} \\
+&amp;\text{Level Equation:}    &amp;l_t           &amp;=  \alpha (y_t/s_{t-m} + (1-\alpha)(l_{t-1}+ b_{t-1}) \\
+&amp;\text{Trend Equation:}    &amp;b_t           &amp;=  \beta^{*}(l_t - l_{t-1}) + (1-\beta^{*}) b_{t-1} \\
+&amp;\text{Seasonal Equation:}    &amp;s_t           &amp;=  \gamma y_t/(l_{t-1} - b_{t-1}) + (1-\gamma) s_{t-m}
+\end{align*}`
+
+- The forecast calculation needs six parameters
+
+    - `\(l_0\)` (initial level value), 
+    - `\(b_0\)` (initial trend value)
+    - `\(s_0\)` (initial trend value)
+    - `\(\alpha\)` (level smoothing parameter) and 
+    - `\(\beta^{*}\)` (trend smoothing parameter)
+    - `\(\gamma\)` (seasonal smoothing parameter)
+     
+---
+# Example
+
+- We study the Quarterly visitor nights (in millions) spent by international tourists to Australia. 1999-2015.
+
+[Dataset](data/austourists.csv)
+
+
+```r
+df &lt;- read.csv('data/austourists.csv')
+y = ts(df, start = c(1999), frequency = 4)
+
+plot(y)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-27-1.png" style="display: block; margin: auto;" /&gt;
+
+- The plot shows the trend and the seasonal component of the series.  Thus, we can use the HW method on this series
+
+---
+# Example
+
+- Holt-Winters' additive method 
+
+
+```r
+y_h &lt;- hw(y,seasonal="additive")
+y_h$model
+```
+
+```
+## Holt-Winters' additive method 
+## 
+## Call:
+##  hw(y = y, seasonal = "additive") 
+## 
+##   Smoothing parameters:
+##     alpha = 0.203 
+##     beta  = 1e-04 
+##     gamma = 0.4655 
+## 
+##   Initial states:
+##     l = 23.0823 
+##     b = 0.5781 
+##     s = 1.6363 -1.191 -8.9649 8.5196
+## 
+##   sigma:  2.4908
+## 
+##      AIC     AICc      BIC 
+## 420.5278 423.6313 440.5034
+```
+
+---
+# Example
+
+- Plot the smoothed series
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Example
+
+- Plot the forecast
+
+
+```r
+plot(y_h)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Example
+
+- We can easily switch to the multiplicative model
+
+
+```r
+y_h &lt;- hw(y,seasonal="multiplicative")
+y_h$model
+```
+
+```
+## Holt-Winters' multiplicative method 
+## 
+## Call:
+##  hw(y = y, seasonal = "multiplicative") 
+## 
+##   Smoothing parameters:
+##     alpha = 0.268 
+##     beta  = 1e-04 
+##     gamma = 0.0247 
+## 
+##   Initial states:
+##     l = 24.4275 
+##     b = 0.5767 
+##     s = 1.0235 0.9607 0.7748 1.241
+## 
+##   sigma:  0.0604
+## 
+##      AIC     AICc      BIC 
+## 413.6953 416.7987 433.6708
+```
+
+---
+# Example
+
+- Plot the smoothed series
+
+
+```r
+plot(y)
+lines(y_h$fitted, col = 'red')
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# Example
+
+- Plot the forecast
+
+
+```r
+plot(y_h)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /&gt;
+    
+    
+---
+# Additive vs. Multiplicative Model
+
+
+- The forecasts generated by the method with the multiplicative seasonality display larger and increasing seasonal variation. 
+
+- Thus for series that has increasing size of the seasonal component we would prefer the multiplicative model
+
+
+---
+# Additive vs. Multiplicative Model
+
+- Let's take a closer look at the series in the previous example
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
+
+- We observe that the seasonal variation of the series seems to increase overtime.  Thus, the multiplicative model may fit the series better
+
+- However, we can always use both models and evaluate the forecast performance on a separate dataset to decide which model make a better forecast
+
+---
+# Holt-Winters’ damped method
+
+- Damping is possible with both additive and multiplicative Holt-Winters’ methods
+
+
+```r
+y_h &lt;- hw(y,seasonal="additive", damped = TRUE)
+plot(y_h)
+```
+
+&lt;img src="note3_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

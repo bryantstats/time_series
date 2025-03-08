@@ -1,0 +1,758 @@
+
+---
+title: "Time Series Regression Models"
+author: <font size="5"> Son Nguyen </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 17px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{css, echo=FALSE}
+.left-code {
+  color: #777;
+  width: 48%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 51%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+
+```{r setup, include = FALSE}
+
+# R markdown options
+knitr::opts_chunk$set(echo = TRUE, 
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center", 
+                      message = FALSE,
+                      warning = FALSE)
+
+# Load packages
+library(tidyverse)
+library(forecast)
+```
+
+# Introduction
+
+- A time series $y_t$ can be forecast using its past values $y_{t-1}, y_{t-2}...$
+
+- In exponential smoothing models, we use the past values of $y_t$ to make forecast for the future values. 
+
+- A time series $y_t$  can also be forecast using another time series $x_t$
+
+- If we assume that $y_t$ is a linear function of $x_t$ we will have an (linear) regression time series model. 
+
+- We will study this model this week. 
+
+
+---
+class: inverse, middle, center
+# Simple Linear Regression
+
+---
+# Simple Linear Regression
+
+- Suppose we want to linearly regress $y_t$ on $x_t$. The model equation is
+
+$$
+y_t = \beta_0 + \beta_1 x_t + \epsilon_t
+$$
+
+- The series $x_t$ is called a predictor series. 
+
+- The model has two parameters $\beta_0$ and $\beta_1$
+
+- $x_t$ could be the $y_{t-k}$, which is a lagged version of $y_t$.  This would make the model `autoregressive model` where it regresses on itself.  We will study these models later on in the class.  
+
+- $x_t$ could be another series or it could be a function of the time $t$
+
+- For stationary series, $x_t$ is usually another time series
+
+- For non-stationary series (with trend or seasonality), $x_t$ is usually a function of the time $t$ (we will see this later on in the slides)
+
+---
+# Least squares estimation
+
+-  Similar to linear regression in statistics, the coefficients $\beta_0$ and $\beta_1$ are computed to minimize the sum squares errors
+
+$$SSE = \sum_{t=1}^T(y_t - \hat{y_t})^2 =  \sum_{t=1}^T(y_t - \beta_0 - \beta_1 x_t)^2$$
+
+- Also notice that the least squared method is not the only way to estimate the parameters.  Another way could be the [absolute least method](https://en.wikipedia.org/wiki/Least_absolute_deviations)
+
+---
+# Example
+
+- Dataset: Percentage changes in quarterly personal consumption expenditure, personal disposable income, production, savings and the unemployment rate for the US, 1970 to 2016. 
+
+[Download](uschange.csv)
+
+```{r}
+library(forecast)
+library(ggplot2)
+# read the data
+uschange =  read.csv('uschange.csv')
+
+# turn the data to a series
+# notice frequency = 4 because this is a quarterly data
+uschange = ts(uschange, start = 1970, frequency = 4)
+```
+
+---
+# Example
+
+```{r}
+plot(uschange)
+```
+
+- From the plot, we observe that this dataset has four five time series data.  
+
+- We will set our response variable to be `Consumption` and the predictor to be `Income`
+
+
+---
+- Plot the response and the predictor
+
+```{r}
+# set up the two series
+yt = uschange[,c("Consumption")] 
+xt =  uschange[,c("Income")] 
+  
+qplot(xt, yt)
+```
+
+---
+
+- Plot the response and the predictor along the time
+
+```{r}
+plot(yt)
+lines(xt, col = 'red')
+```
+
+---
+
+- We use the function `tslm` to fit the model
+
+```{r}
+model = tslm(yt ~ xt)
+model
+```
+- From the result, we have the equation of the fitted model
+
+$$\text{Consumption}  = 0.5451 + 0.2806 \cdot \text{Income}$$
+
+---
+class: inverse, middle, center
+
+# Model Evaluation
+
+
+---
+# Model Evaluation
+
+- How good is the model, or how well the model fit the data?
+
+There are multiple ways to evaluate how good the linear regression is.  We focus on the following ways.
+
+- (1) $R^2$
+
+- (2) The plot between the fitted values produced by the model and the true values of the response. 
+
+- (3) The plot of the residual
+
+---
+# R Squared
+
+$$R^2 = 1 -  \frac{\sum (y_t - \hat{y}_t)^2}{\sum (y_t - \bar{y})^2}$$
+
+- The $R^2$ compares the regression model with the baseline model where $y_t = \bar{y}$.  
+
+- $R^2 = 0$ means the regression model is as good as the baseline model, hence, it is not a good fit (the linear model does not fit the data well.  There is a non-linear relationship between the response and the predictors). 
+
+- The greater the $R^2$ the better the fit. The maximum is when $R^2 = 1$.  This is when we have a perfect fit: the response and the predictor have a perfect linear relationship. 
+
+---
+# Example
+
+- Let see the $R^2$ of the model in the previous example. 
+
+```{r}
+summary(model)
+```
+
+- We see that the R-Squared is 0.159.  This indicates that the regression model is not a very good fit. 
+
+
+---
+# Model Evaluation 
+
+- Another way to look at how good the model is is to plot (scatter plot) the fitted values and the response values in the same coordinate. 
+
+- A good fit will produce points that along the line $y = x$.  The closer the points from the line, the better the fit. 
+
+---
+# Example
+
+- Let plot the scatter plot between the fitted values and the response in the previous example.  To make the codes easier to read, we create a function `fit_plot` to do that.  The function inputs the fitted model and output the plot. 
+
+
+```{r}
+fit_plot = function(m)
+{
+library(tidyverse)
+library(ggplot2)
+  
+true_value = m$x
+fitted_value = fitted(m)
+
+limit = c(min(true_value), max(true_value))
+# Plot
+cbind(true_value, fitted_value)%>%
+  as.data.frame() %>% 
+  ggplot(aes(x=true_value, y=fitted_value)) +
+  geom_point() +
+  geom_abline(intercept=0, slope=1, color = 'red')+
+  coord_cartesian(xlim = limit, 
+                  ylim = limit) 
+}
+```
+
+
+```{r, eval=FALSE, echo=FALSE}
+fit_plot = function(true_value, fitted_value)
+{
+library(tidyverse)
+library(ggplot2)
+limit = c(min(true_value), max(true_value))
+# Plot
+cbind(true_value, fitted_value)%>%
+  as.data.frame() %>% 
+  ggplot(aes(x=true_value, y=fitted_value)) +
+  geom_point() +
+  geom_abline(intercept=0, slope=1, color = 'red')+
+  coord_cartesian(xlim = limit, 
+                  ylim = limit) 
+}
+```
+
+
+
+---
+# Model Evaluation
+
+- Now let plot the scatter plot between the fitted values and the response in the previous example. 
+
+```{r}
+model <- tslm(yt ~ xt)
+```
+
+
+---
+# Model Evaluation
+
+- Now let plot the scatter plot between the fitted values and the response in the previous example. 
+
+```{r, echo=FALSE}
+fit_plot(model)
+```
+
+- The points not standing very close to the red line ( $y=x$ ) indicates a poor fit. 
+
+---
+# Model Evaluation
+
+- A residual is the difference between the response values and the fitted values or $(\hat{y}_t- y_t)$
+
+- We could look at the autocorrelation (ACF) of the residuals model to judge how well the model fit the data
+
+- Residuals of a good fit should be a normal white-noise.  Thus, the ACF should stays within the blue strip and the histogram should be normally distributed around 0
+
+
+---
+# Model Evaluation
+
+- Let's take a look at the plot related to the residuals of the model in the previous example
+
+```{r, eval=FALSE}
+checkresiduals(model)
+```
+
+
+---
+# Model Evaluation
+
+```{r, echo=FALSE}
+checkresiduals(model)
+```
+
+- We observe that although it is not very clear, the first few values of the ACF are outside of the blue strip, indicating that the residual series may not be a white noise. 
+
+---
+# Model Evaluation
+
+```{r, echo=FALSE}
+checkresiduals(model)
+```
+
+- We also see that the histogram of the residuals looks normally distributed from 0.  Thus, the residuals analysis should be used along with other model evaluation methods ( $R^2$ and the fitted values plot)
+
+---
+class: inverse, middle, center
+# Series with Trend
+
+---
+# Series with Trend
+
+- If two series $a_t$ and $b_t$ have a linear trend, then both $a_t$ and $b_t$ will be a linear function of the time $t$.
+
+- Thus, $a_t$ and $b_t$ will have a linear relationship and the linear model fit $a_t$ and $b_t$ should always be a good fit even though in the case the two series may be very strange with each other. 
+
+---
+# Example
+
+- Dataset: Total annual air passengers (in millions) including domestic and international aircraft passengers of air carriers registered in Australia. 1970-2016.
+
+[Download](aus_airpassengers.csv)
+
+```{r}
+a_t = read.csv('aus_airpassengers.csv')
+
+# frequency = 1 because this is a annual data
+# the year start from 1970
+a_t = ts(a_t, start = 1970, frequency = 1)
+plot(a_t)
+```
+
+- We observe that this series has a trend
+
+---
+# Example
+
+Dataset: Total annual rice production (million metric tons) for Guinea. 1970-2011.
+
+[Download](guinea_rice.csv)
+
+```{r}
+b_t = read.csv('guinea_rice.csv')
+# frequency = 1 because this is a annual data
+# the year start from 1970
+b_t = ts(a_t, start = 1970, frequency = 1)
+plot(b_t)
+```
+
+- We observe that this series has a trend
+
+---
+# Example
+
+- Let's regress Total annual air passengers on the Total annual rice production
+
+```{r}
+model = tslm(a_t ~ b_t)
+summary(model)
+```
+
+- We notice that the $R^2 = 1$ indicating a perfect fit!
+
+- However, air passenger traffic in Australia has nothing to do with rice production in Guinea
+
+- This is called Spurious Regression!
+
+---
+# Example
+
+```{r}
+fit_plot(model)
+```
+
+- All the points lie on the line $y = x$ (red line) indicates that the model fits the data almost perfectly. 
+
+---
+class: middle, center, inverse
+# Time predictors
+
+---
+# Time predictors
+
+
+- When we think that a series has a linear trend, we could apply linear regression where the predictor is the time variable
+
+$$
+y_t =  \beta_0 + \beta_1t
+$$
+- The series is a linear function of the time $t$
+
+---
+# Time predictors
+
+Let fit the Total annual air passengers on the time $t$
+
+```{r}
+model <- tslm(a_t ~ trend)
+summary(model)
+```
+
+- We notice the very high $R^2$ value indicate a good fit.
+
+---
+
+```{r}
+fit_plot(model)
+```
+
+- The points standing very close to the red line indicates a good fit. 
+
+
+
+---
+class: inverse, center, middle
+# Multiple linear regression
+
+---
+# Multiple linear regression
+
+
+-  If there are more than one predictors, we will have multiple (linear) regression
+
+$$y_t = \beta_0 + \beta_1 x_{1,t} +...+ \beta_k x_{k,t} + \epsilon_t$$
+
+---
+# Example
+
+Let comeback to the first series
+
+```{r}
+uschange =  read.csv('uschange.csv')
+
+# turn the data to a series
+# notice frequency = 4 because this is a quarterly data
+uschange = ts(uschange, start = 1970, frequency = 4)
+
+model = tslm(Consumption ~ Income + Savings, data=uschange)
+```
+
+---
+# Example
+
+```{r}
+summary(model)
+```
+
+- We observe that `Income` has a positive effect on `Consumption` while and `Savings` has a negative effect on `Consumption`.
+
+---
+# Example
+
+
+```{r}
+fit_plot(model)
+```
+
+- The points standing very close to the red line indicates a good fit. 
+
+
+---
+class: middle, center, inverse
+# Series with Seasonality
+
+---
+# Series with Seasonality
+
+
+- If the series has seasonality, we could use multiple regression where the predictors are indicator variables.
+
+- For example: Suppose we have a quarterly series $y_t$ where we think the series has a seasonal component only. We can regress $y_t$ on a categorical time variable $t$. 
+
+- Here $t = 1, 2, 3, 4$ is the time variable: $t=1$ for quarter 1, $t=2$ for quarter 2, and so on
+
+- Since $t$ is categorical variable, we need to convert it to numeric variables to for the machine to interpret. 
+
+- The conversion of $t$ into three (not four) binary variables $I_1, I_2, I_3$.   works as follows. 
+
+| Quarter ( $t$) | $I_2$ | $I_3$ | $I_4$ |
+|---------|----|----|----|
+| 1       | 0  | 0  | 0  |
+| 2       | 1  | 0  | 0  |
+| 3       | 0  | 1  | 0  |
+| 4       | 0  | 0  | 1  |
+
+- $I_2 = 1$ means the time is at quarter 2 and $I_2 = 0$ means the time is not at quarter 2. The combination values of $I_2, I_3, I_4$ will specify the quarter. 
+
+---
+# Series with Seasonality
+
+- Thus, we can establish the linear model as follows. 
+
+$$y_t =  \beta_0 + \beta_2 I_2+ \beta_3 I_3+ \beta_4 I_4$$
+
+- Notice that we do not use the notation of $\beta_1$ here for mathematical convenience. 
+
+- Notice also that to model a quarterly seasonality component one would need four parameters. 
+
+---
+# Example
+
+- Let study the series of total quarterly beer production in Australia (in megalitres) from 1992:Q1 to 2010:Q2.
+
+[Dataset](beer.csv)
+
+```{r}
+y = read.csv('beer.csv')
+y = ts(y, start = c(1992, 1), frequency = 4)
+```
+
+---
+# Example
+
+```{r}
+plot(y)
+```
+
+- The series plot indicates that the series has a seasonal component. 
+
+---
+# Example
+
+- We train a linear regression with a quarterly time predictor. 
+
+```{r}
+model <- tslm(y ~ season)
+model
+```
+
+- The model has four parameters as shown above. 
+
+---
+
+```{r}
+summary(model)
+```
+
+- We see that this model fit the data pretty well because of a high $R^2$.
+
+---
+class: middle, center, inverse
+# Series with Trend and Seasonality
+
+---
+# Series with Trend and Seasonality
+
+If we believe there is the series has a trend component, we can also include both trend and seasonality into the linear regression as follows. 
+
+$$
+y_t =  \beta_0 + \beta_1 t +  \beta_2 I_2+ \beta_3 I_3+ \beta_4 I_4
+$$
+
+This model will have five parameters. 
+
+---
+# Series with Trend and Seasonality
+
+```{r}
+y = read.csv('beer.csv')
+y = ts(y, start = c(1992, 1), frequency = 4)
+model <- tslm(y ~ trend + season)
+summary(model)
+```
+
+
+---
+# Series with Trend and Seasonality
+
+```{r}
+fit_plot(model)
+```
+
+- The points standing very close to the red line indicates a good fit. 
+
+- We also observe that adding the trend component makes a better model. 
+
+
+---
+#  What linear model to choose?
+
+Suppose we want to use linear regression to model a time series. Here are some recommendation on what linear model to use: 
+
+- For stationary series (no trend and no seasonality), consider to use other series as the predictors of the regression or `model <- tslm(y ~ x1 + x2+...`
+
+- For non-stationary series with trend, consider to use the time as the continuous predictor: `model <- tslm(y ~ trend)`
+
+- For non-stationary series with seasonality, consider to use the time as the categorical predictor: `model <- tslm(y ~ season)`
+
+- For non-stationary series with both trend and seasonality, consider to use the time as the continous predictor and categorical predictor `model <- tslm(y ~ trend + season)`
+
+
+
+---
+class: middle, inverse, center
+
+# Forecasting 
+
+
+---
+# Forecasting 
+
+- Suppose we regress $y_t$ on predictor $x_t$.  
+
+- To make a forecast for $y_t$ we need to provide the model with the value of $x_t$.  
+
+- Since the value of $x_t$ may not be available at the time of forecasting, we also need to make a forecast for $x_t$ first.
+
+---
+# Forecasting 
+
+The forecasting for $y_t$ needs two steps
+
+- (1)  Forecast the value of the predictor $x_t$
+- (2)  Using the regression model to forecast the value of $y_t$
+
+The quality of forecasting $y_t$ depends on the both steps
+
+A good fit model may not produce a good forecast due to the poor forecast of the predictor. 
+
+
+---
+# Example
+
+```{r}
+# fit the model
+model <- tslm(Consumption ~ Income, data = uschange)
+
+# Set future values of the predictor Income by the average
+newdata = data.frame(
+    Income = rep(mean(uschange[,"Income"]), 10))
+
+# use the forecast predictor to forecast response
+my_forecast <- forecast(model,
+    newdata = newdata)
+
+plot(my_forecast)
+```
+
+
+
+- Since the forecast of predictors are the same in the next five periods, the forecast of the response also the same (constant) in the next 5 periods.
+
+
+---
+class: middle, center, inverse
+# Series with Trend and Seasonality
+
+---
+# Series with Trend or Seasonality
+
+- For model train with the time predictor and the seasonal predictor,  we do not need to provide the model with the values the predictor. 
+
+---
+# Example 
+
+- We will fit a regression model with a continuous time predictor and categorical time predictor. 
+
+```{r}
+y = read.csv('beer.csv')
+y = ts(y, start = c(1992, 1), frequency = 4)
+
+# fit the model
+model <- tslm(y ~ trend + season)
+```
+
+
+---
+# Example 
+
+- Make and plot forecast
+
+
+```{r}
+# make forecast
+fcast <- forecast(model)
+
+# plot forecast
+autoplot(fcast) +
+  ggtitle("Forecasts of beer production using regression") +
+  xlab("Year") + ylab("megalitres")
+```
+
+
+
